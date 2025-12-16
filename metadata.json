@@ -1,0 +1,7 @@
+{
+  "name": "CollegeGate.in",
+  "description": "A comprehensive platform for college information, rankings, and exams in India and abroad. Features AI-powered image editing for campus visualization and real-time anonymous voice counseling.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}

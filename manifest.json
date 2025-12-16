@@ -1,0 +1,22 @@
+{
+  "short_name": "CollegeGate",
+  "name": "CollegeGate: College Admissions & Counseling",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/8074/8074808.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/8074/8074808.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#f8fafc",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#4F46E5",
+  "orientation": "portrait"
+}
