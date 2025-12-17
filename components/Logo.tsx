@@ -2,54 +2,47 @@ import React from 'react';
 
 const Logo = ({ className = "w-12 h-12" }: { className?: string }) => {
   return (
-    <div className={`${className} relative`}>
+    <div className={`${className} relative select-none`}>
       <svg
-        viewBox="0 0 200 200"
+        viewBox="0 0 500 500"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        className="w-full h-full drop-shadow-md"
+        className="w-full h-full"
       >
-        <defs>
-          <linearGradient id="gateGradient" x1="20" y1="20" x2="180" y2="180" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#4F46E5" />
-            <stop offset="100%" stopColor="#7C3AED" />
-          </linearGradient>
-        </defs>
+        {/* Outer Double Ring */}
+        <circle cx="250" cy="250" r="240" stroke="#0F2C4C" strokeWidth="4" />
+        <circle cx="250" cy="250" r="225" stroke="#0F2C4C" strokeWidth="2" />
 
-        {/* Shield Background */}
-        <path
-          d="M100 20 C100 20 160 40 160 90 C160 140 100 180 100 180 C100 180 40 140 40 90 C40 40 100 20 100 20 Z"
-          fill="url(#gateGradient)"
-        />
+        {/* Top Text: EST. 2023 */}
+        <text x="250" y="85" textAnchor="middle" fill="#64748B" fontSize="24" fontFamily="'Plus Jakarta Sans', sans-serif" fontWeight="600" letterSpacing="0.1em">
+             EST. 2023
+        </text>
 
-        {/* Inner Outline */}
-        <path
-          d="M100 28 C100 28 152 45 152 90 C152 132 100 168 100 168 C100 168 48 132 48 90 C48 45 100 28 100 28 Z"
-          stroke="white"
-          strokeWidth="2"
-          strokeOpacity="0.2"
-        />
+        {/* Center Icon Group */}
+        <g transform="translate(135, 115)">
+            {/* Graduation Cap */}
+            <path d="M115 10 L 175 35 L 115 60 L 55 35 Z" fill="#0F2C4C" />
+            <path d="M175 35 V 65" stroke="#0F2C4C" strokeWidth="3" /> 
 
-        {/* Stylized Gate/Pillars */}
-        <path
-          d="M75 120 V85 C75 70 85 60 100 60 C115 60 125 70 125 85 V120"
-          stroke="white"
-          strokeWidth="6"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        
-        {/* Book/Education Symbol */}
-        <path
-          d="M90 105 L100 110 L110 105 V125 L100 130 L90 125 Z"
-          fill="#FCD34D"
-        />
-        
-        {/* Horizontal Bar */}
-        <path d="M75 95 H125" stroke="white" strokeWidth="4" strokeOpacity="0.8" />
-        
-        {/* Sparkle Accent */}
-        <circle cx="140" cy="50" r="6" fill="#FCD34D" className="animate-pulse" />
+            {/* Books (Pillars) - Left */}
+            <path d="M30 75 H 85 V 195 Q 57.5 215 30 195 Z" fill="#0F2C4C" />
+            {/* Books (Pillars) - Right */}
+            <path d="M145 75 H 200 V 195 Q 172.5 215 145 195 Z" fill="#0F2C4C" />
+
+            {/* Upward Arrow (Orange) */}
+            <path d="M115 85 L 160 130 H 135 V 205 H 95 V 130 H 70 L 115 85 Z" fill="#F97316" />
+        </g>
+
+        {/* Main Text: COLLEGEGATE (Creative Split Color) */}
+        <text x="250" y="385" textAnchor="middle" fontSize="52" fontFamily="'Plus Jakarta Sans', sans-serif" fontWeight="800" letterSpacing="-0.02em">
+          <tspan fill="#0F2C4C">COLLEGE</tspan>
+          <tspan fill="#F97316">GATE</tspan>
+        </text>
+
+        {/* Sub Text: ENTRANCE OF STUDENTS CHOICE */}
+        <text x="250" y="425" textAnchor="middle" fill="#475569" fontSize="16" fontFamily="'Plus Jakarta Sans', sans-serif" fontWeight="600" letterSpacing="0.15em">
+          ENTRANCE OF STUDENTS CHOICE
+        </text>
       </svg>
     </div>
   );

@@ -35,31 +35,40 @@ const SignIn: React.FC<SignInProps> = ({ onLogin, onCancel }) => {
         return;
     }
 
-    const newUser: User = {
-        id: Date.now().toString(),
-        name: formData.name,
-        email: formData.email,
-        role: activeTab,
-        timestamp: new Date().toLocaleString(),
-        specialization: activeTab === 'COUNSELOR' ? formData.specialization : undefined,
-        studentId: activeTab === 'STUDENT' ? `ST-${Math.floor(Math.random() * 10000)}` : undefined
-    };
-
-    // --- Simulating Backend Storage in LocalStorage (The "Admin Log In" Data Store) ---
+    // --- Backend Storage Simulation (Local Storage) ---
     const existingUsersStr = localStorage.getItem('collegegate_users');
     const existingUsers: User[] = existingUsersStr ? JSON.parse(existingUsersStr) : [];
     
-    // Check for duplicates (simple email check)
-    const isDuplicate = existingUsers.some(u => u.email === newUser.email && u.role === newUser.role);
-    
-    // For demo purposes, we log them in even if duplicate, but update the timestamp
-    // In a real app, you'd check password hash
-    if (!isDuplicate) {
+    // Find if user already exists
+    const existingUser = existingUsers.find(u => u.email === formData.email && u.role === activeTab);
+
+    if (existingUser) {
+        // CHECK BAN STATUS
+        if (existingUser.banned) {
+            setError("⛔ Access Denied: Your account has been suspended by the Administrator.");
+            return;
+        }
+
+        // Log in with existing user data (preserves ID)
+        onLogin(existingUser);
+    } else {
+        // Create NEW user
+        const newUser: User = {
+            id: Date.now().toString(),
+            name: formData.name,
+            email: formData.email,
+            role: activeTab,
+            timestamp: new Date().toLocaleString(),
+            specialization: activeTab === 'COUNSELOR' ? formData.specialization : undefined,
+            studentId: activeTab === 'STUDENT' ? `ST-${Math.floor(Math.random() * 10000)}` : undefined,
+            banned: false
+        };
+
         const updatedUsers = [...existingUsers, newUser];
         localStorage.setItem('collegegate_users', JSON.stringify(updatedUsers));
+        
+        onLogin(newUser);
     }
-
-    onLogin(newUser);
   };
 
   return (
@@ -103,7 +112,7 @@ const SignIn: React.FC<SignInProps> = ({ onLogin, onCancel }) => {
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
-                    {error && <div className="p-3 bg-red-50 text-red-600 text-sm rounded-lg text-center">{error}</div>}
+                    {error && <div className="p-3 bg-red-50 text-red-600 text-sm rounded-lg text-center font-semibold animate-pulse">{error}</div>}
                     
                     <div>
                         <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Full Name</label>

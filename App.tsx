@@ -400,8 +400,9 @@ function App() {
           <div className="flex justify-between h-full items-center">
             <div className="flex items-center gap-2.5 cursor-pointer group" onClick={() => setCurrentView(NavView.HOME)}>
               <Logo className="w-9 h-9 group-hover:scale-110 transition-transform duration-300" />
-              <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-700 to-purple-600 tracking-tight">
-                CollegeGate
+              <span className="text-xl font-extrabold tracking-tight">
+                <span className="text-[#0F2C4C]">College</span>
+                <span className="text-[#F97316]">Gate</span>
               </span>
             </div>
 
@@ -503,7 +504,10 @@ function App() {
             <div className="space-y-4">
                 <div className="flex items-center gap-2">
                     <Logo className="w-8 h-8" />
-                    <span className="text-xl font-bold text-white">CollegeGate</span>
+                    <span className="text-xl font-extrabold tracking-tight">
+                        <span className="text-white">College</span>
+                        <span className="text-[#F97316]">Gate</span>
+                    </span>
                 </div>
                 <p className="text-sm text-slate-400 leading-relaxed">
                     AI-powered educational platform connecting students with their dream institutes globally.

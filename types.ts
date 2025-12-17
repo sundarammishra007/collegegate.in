@@ -49,6 +49,7 @@ export interface User {
   specialization?: string; // For counselors
   studentId?: string; // For students
   timestamp: string;
+  banned?: boolean;
 }
 
 export interface Inquiry {
