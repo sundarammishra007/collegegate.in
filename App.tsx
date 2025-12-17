@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { NavView, College } from './types';
+import React, { useState, useEffect } from 'react';
+import { NavView, College, User, Inquiry } from './types';
 import { MOCK_COLLEGES } from './constants';
 import MagicCampus from './components/MagicCampus';
 import LiveCounselor from './components/LiveCounselor';
@@ -7,24 +7,56 @@ import CollegeRegistration from './components/CollegeRegistration';
 import CollegeInquiry from './components/CollegeInquiry';
 import CompareView from './components/CompareView';
 import CollegeDetailView from './components/CollegeDetailView';
+import SignIn from './components/SignIn';
+import AdminDashboard from './components/AdminDashboard';
+import CounselorDashboard from './components/CounselorDashboard';
 import Logo from './components/Logo';
 
 function App() {
   const [currentView, setCurrentView] = useState<NavView>(NavView.HOME);
+  const [user, setUser] = useState<User | null>(null);
+  
+  // Data States
   const [colleges, setColleges] = useState<College[]>(MOCK_COLLEGES);
+  const [inquiries, setInquiries] = useState<Inquiry[]>([]);
+  
+  // Filter States
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCountry, setFilterCountry] = useState<'All' | 'India' | 'Abroad' | 'Online'>('All');
   const [filterCategory, setFilterCategory] = useState<'All' | 'Medical' | 'Engineering' | 'Management' | 'Law' | 'Design' | 'Online'>('All');
   
-  // State for comparison
+  // UI States
   const [compareList, setCompareList] = useState<string[]>([]);
-  // State for Detail View
   const [selectedCollegeId, setSelectedCollegeId] = useState<string | null>(null);
 
   // Scroll to top on view change
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [currentView]);
+
+  const handleLogin = (loggedInUser: User) => {
+    setUser(loggedInUser);
+    // Route based on role
+    if (loggedInUser.role === 'ADMIN') {
+        setCurrentView(NavView.ADMIN_DASHBOARD);
+    } else if (loggedInUser.role === 'COUNSELOR') {
+        setCurrentView(NavView.COUNSELOR_DASHBOARD);
+    } else {
+        // Student goes home or back to where they were
+        setCurrentView(NavView.HOME);
+    }
+  };
+
+  const handleLogout = () => {
+      setUser(null);
+      setCurrentView(NavView.HOME);
+  };
+
+  const handleInquirySubmit = (newInquiry: Inquiry) => {
+      // Add to global state so counselors can see it
+      setInquiries(prev => [newInquiry, ...prev]);
+      // Optional: Add notification logic here
+  };
 
   const filteredColleges = colleges.filter(c => {
     const matchesSearch = c.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -92,6 +124,17 @@ function App() {
 
   const renderContent = () => {
     switch (currentView) {
+      case NavView.AUTH:
+          return <SignIn onLogin={handleLogin} onCancel={() => setCurrentView(NavView.HOME)} />;
+      
+      case NavView.ADMIN_DASHBOARD:
+          if (user?.role !== 'ADMIN') return <SignIn onLogin={handleLogin} onCancel={() => setCurrentView(NavView.HOME)} />;
+          return <AdminDashboard />;
+
+      case NavView.COUNSELOR_DASHBOARD:
+          if (user?.role !== 'COUNSELOR') return <SignIn onLogin={handleLogin} onCancel={() => setCurrentView(NavView.HOME)} />;
+          return <CounselorDashboard counselor={user} inquiries={inquiries} />;
+
       case NavView.HOME:
       case NavView.COLLEGES:
         return (
@@ -103,11 +146,14 @@ function App() {
                <div className="absolute bottom-0 left-0 -mb-4 -ml-4 w-32 h-32 bg-purple-500 opacity-20 rounded-full blur-2xl"></div>
                
                <div className="mb-4 md:mb-0 relative z-10 text-center md:text-left">
-                  <h2 className="text-xl md:text-2xl font-bold mb-1">Unsure about your future?</h2>
+                  <h2 className="text-xl md:text-2xl font-bold mb-1">Find Your Perfect College Match</h2>
                   <p className="text-indigo-100 text-sm md:text-base">Get AI-powered advice on colleges, exams & more.</p>
                </div>
                <button 
-                 onClick={() => setCurrentView(NavView.INQUIRY)}
+                 onClick={() => {
+                     if (!user) setCurrentView(NavView.AUTH);
+                     else setCurrentView(NavView.INQUIRY);
+                 }}
                  className="relative z-10 bg-white text-indigo-700 px-6 py-2.5 rounded-xl font-bold hover:bg-indigo-50 transition-all shadow-lg active:scale-95 text-sm md:text-base"
                >
                  Ask to College &rarr;
@@ -304,6 +350,16 @@ function App() {
       case NavView.MAGIC_CAMPUS:
         return <MagicCampus />;
       case NavView.VOICE_LOUNGE:
+        // Role check
+        if (!user || user.role !== 'STUDENT') {
+             return (
+                 <div className="flex items-center justify-center h-[60vh] flex-col p-8 text-center">
+                     <h2 className="text-2xl font-bold mb-4">Student Access Only</h2>
+                     <p className="text-slate-500 mb-6">Please sign in as a student to access the anonymous counselor.</p>
+                     <button onClick={() => setCurrentView(NavView.AUTH)} className="bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold">Sign In</button>
+                 </div>
+             )
+        }
         return (
             <div className="h-[calc(100vh-140px)] md:h-[calc(100vh-160px)] p-4 max-w-4xl mx-auto">
                 <LiveCounselor />
@@ -312,7 +368,7 @@ function App() {
       case NavView.REGISTER:
         return <CollegeRegistration onSubmit={handleRegisterCollege} onCancel={() => setCurrentView(NavView.HOME)} />;
       case NavView.INQUIRY:
-        return <CollegeInquiry onCancel={() => setCurrentView(NavView.HOME)} />;
+        return <CollegeInquiry user={user} onSubmit={handleInquirySubmit} onCancel={() => setCurrentView(NavView.HOME)} />;
       case NavView.COMPARE:
         return (
             <CompareView 
@@ -357,7 +413,10 @@ function App() {
                 Colleges
               </button>
               <button 
-                onClick={() => setCurrentView(NavView.INQUIRY)}
+                onClick={() => {
+                    if (!user) setCurrentView(NavView.AUTH);
+                    else setCurrentView(NavView.INQUIRY);
+                }}
                 className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-all ${currentView === NavView.INQUIRY ? 'bg-white text-indigo-700 shadow-sm' : 'text-slate-500 hover:text-slate-900'}`}
               >
                 Inquiry
@@ -383,9 +442,29 @@ function App() {
                  >
                     Partner
                  </button>
-                 <button className="px-5 py-2 text-sm font-bold text-white bg-slate-900 rounded-full hover:bg-slate-800 shadow-lg shadow-slate-200 transition-all active:scale-95">
-                    Sign In
-                 </button>
+                 
+                 {!user ? (
+                     <button 
+                        onClick={() => setCurrentView(NavView.AUTH)}
+                        className="px-5 py-2 text-sm font-bold text-white bg-slate-900 rounded-full hover:bg-slate-800 shadow-lg shadow-slate-200 transition-all active:scale-95"
+                    >
+                        Sign In
+                    </button>
+                 ) : (
+                     <div className="flex items-center gap-3">
+                         <div className="text-right hidden sm:block">
+                             <p className="text-xs font-bold text-slate-800">{user.name}</p>
+                             <p className="text-[10px] font-semibold text-slate-500 uppercase">{user.role}</p>
+                         </div>
+                         <button 
+                            onClick={handleLogout}
+                            className="w-9 h-9 rounded-full bg-slate-200 hover:bg-red-100 text-slate-600 hover:text-red-600 flex items-center justify-center transition-colors"
+                            title="Log Out"
+                        >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+                        </button>
+                     </div>
+                 )}
             </div>
           </div>
         </div>
@@ -403,9 +482,9 @@ function App() {
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
                 <span className="text-[10px] font-semibold">Home</span>
              </button>
-             <button onClick={() => setCurrentView(NavView.INQUIRY)} className={`flex-1 flex flex-col items-center justify-center gap-1 h-full ${currentView === NavView.INQUIRY ? 'text-indigo-600' : 'text-slate-400'}`}>
+             <button onClick={() => user?.role === 'COUNSELOR' ? setCurrentView(NavView.COUNSELOR_DASHBOARD) : setCurrentView(NavView.INQUIRY)} className={`flex-1 flex flex-col items-center justify-center gap-1 h-full ${currentView === NavView.INQUIRY || currentView === NavView.COUNSELOR_DASHBOARD ? 'text-indigo-600' : 'text-slate-400'}`}>
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
-                <span className="text-[10px] font-semibold">Ask</span>
+                <span className="text-[10px] font-semibold">{user?.role === 'COUNSELOR' ? 'Dash' : 'Ask'}</span>
              </button>
              <button onClick={() => setCurrentView(NavView.MAGIC_CAMPUS)} className={`flex-1 flex flex-col items-center justify-center gap-1 h-full ${currentView === NavView.MAGIC_CAMPUS ? 'text-indigo-600' : 'text-slate-400'}`}>
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>

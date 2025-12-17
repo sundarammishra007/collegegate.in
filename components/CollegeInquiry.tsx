@@ -1,18 +1,40 @@
 import React, { useState } from 'react';
+import { User, Inquiry } from '../types';
 
 interface CollegeInquiryProps {
+  user?: User | null;
+  onSubmit?: (inquiry: Inquiry) => void;
   onCancel: () => void;
 }
 
-const CollegeInquiry: React.FC<CollegeInquiryProps> = ({ onCancel }) => {
+const CollegeInquiry: React.FC<CollegeInquiryProps> = ({ user, onSubmit, onCancel }) => {
   const [submitted, setSubmitted] = useState(false);
+  const [formData, setFormData] = useState({
+      course: '',
+      query: '',
+      city: '',
+      phone: ''
+  });
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate API call
-    setTimeout(() => {
-      setSubmitted(true);
-    }, 1000);
+    
+    // Create inquiry object
+    const newInquiry: Inquiry = {
+        id: Date.now().toString(),
+        studentName: user ? user.name : 'Anonymous Student',
+        studentId: user?.studentId || 'GUEST',
+        course: formData.course,
+        query: formData.query,
+        timestamp: new Date().toLocaleString(),
+        status: 'PENDING'
+    };
+
+    if (onSubmit) {
+        onSubmit(newInquiry);
+    }
+
+    setSubmitted(true);
   };
 
   if (submitted) {
@@ -23,7 +45,7 @@ const CollegeInquiry: React.FC<CollegeInquiryProps> = ({ onCancel }) => {
         </div>
         <h2 className="text-3xl font-bold text-gray-800 mb-4">Inquiry Received!</h2>
         <p className="text-gray-600 mb-8">
-          Thank you for showing interest. Our expert counselors will analyze your profile and contact you within 24 hours with a personalized list of colleges.
+          Thank you {user ? user.name : 'for showing interest'}. Your inquiry has been sent to our counselor panel anonymously (ID: {user?.studentId || 'Guest'}). They will respond shortly.
         </p>
         <button 
           onClick={onCancel}
@@ -69,28 +91,34 @@ const CollegeInquiry: React.FC<CollegeInquiryProps> = ({ onCancel }) => {
         {/* Right Side - Form */}
         <div className="md:w-2/3 p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
-            <h3 className="text-xl font-semibold text-gray-800">Tell us about yourself</h3>
+            <h3 className="text-xl font-semibold text-gray-800">
+                {user ? `Welcome back, ${user.name}` : 'Tell us about yourself'}
+            </h3>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-1">
-                <label className="text-xs font-semibold text-gray-500 uppercase">Full Name</label>
-                <input type="text" className="w-full border-b-2 border-gray-200 focus:border-indigo-600 outline-none py-2 transition-colors" placeholder="John Doe" required />
-              </div>
-              <div className="space-y-1">
-                <label className="text-xs font-semibold text-gray-500 uppercase">Phone Number</label>
-                <input type="tel" className="w-full border-b-2 border-gray-200 focus:border-indigo-600 outline-none py-2 transition-colors" placeholder="+91 98765 43210" required />
-              </div>
-            </div>
+            {!user && (
+                <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200 mb-4">
+                    <p className="text-sm text-yellow-800">
+                        Please <button type="button" className="underline font-bold" onClick={() => {}}>Sign In</button> to track your inquiries better.
+                    </p>
+                </div>
+            )}
 
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-gray-500 uppercase">Email Address</label>
-              <input type="email" className="w-full border-b-2 border-gray-200 focus:border-indigo-600 outline-none py-2 transition-colors" placeholder="john@example.com" required />
-            </div>
+            {!user && (
+                <div className="space-y-1">
+                    <label className="text-xs font-semibold text-gray-500 uppercase">Email Address</label>
+                    <input type="email" className="w-full border-b-2 border-gray-200 focus:border-indigo-600 outline-none py-2 transition-colors" placeholder="john@example.com" required />
+                </div>
+            )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-1">
                 <label className="text-xs font-semibold text-gray-500 uppercase">Course Interest</label>
-                <select className="w-full border-b-2 border-gray-200 focus:border-indigo-600 outline-none py-2 bg-transparent" required>
+                <select 
+                    value={formData.course}
+                    onChange={(e) => setFormData({...formData, course: e.target.value})}
+                    className="w-full border-b-2 border-gray-200 focus:border-indigo-600 outline-none py-2 bg-transparent" 
+                    required
+                >
                   <option value="">Select Course</option>
                   <option value="MBA">MBA / PGDM</option>
                   <option value="BTECH">B.Tech / B.E</option>
@@ -103,13 +131,26 @@ const CollegeInquiry: React.FC<CollegeInquiryProps> = ({ onCancel }) => {
               </div>
               <div className="space-y-1">
                 <label className="text-xs font-semibold text-gray-500 uppercase">Current City</label>
-                <input type="text" className="w-full border-b-2 border-gray-200 focus:border-indigo-600 outline-none py-2 transition-colors" placeholder="e.g. Mumbai" />
+                <input 
+                    type="text" 
+                    value={formData.city}
+                    onChange={(e) => setFormData({...formData, city: e.target.value})}
+                    className="w-full border-b-2 border-gray-200 focus:border-indigo-600 outline-none py-2 transition-colors" 
+                    placeholder="e.g. Mumbai" 
+                />
               </div>
             </div>
 
             <div className="space-y-1">
-               <label className="text-xs font-semibold text-gray-500 uppercase">Specific Query (Optional)</label>
-               <textarea rows={3} className="w-full border-2 border-gray-100 rounded-lg p-3 focus:border-indigo-600 outline-none transition-colors text-sm" placeholder="I am looking for colleges with low fees and good placement in Computer Science..."></textarea>
+               <label className="text-xs font-semibold text-gray-500 uppercase">Specific Query</label>
+               <textarea 
+                    rows={3} 
+                    value={formData.query}
+                    onChange={(e) => setFormData({...formData, query: e.target.value})}
+                    className="w-full border-2 border-gray-100 rounded-lg p-3 focus:border-indigo-600 outline-none transition-colors text-sm" 
+                    placeholder="I am looking for colleges with low fees and good placement in Computer Science..."
+                    required
+                ></textarea>
             </div>
 
             <div className="flex items-center gap-4 pt-4">
@@ -124,7 +165,7 @@ const CollegeInquiry: React.FC<CollegeInquiryProps> = ({ onCancel }) => {
                 type="submit" 
                 className="flex-grow px-6 py-3 bg-indigo-600 text-white rounded-lg font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition-all"
               >
-                Get Best Colleges
+                Send to Counselors
               </button>
             </div>
 
