@@ -10,6 +10,7 @@ import CollegeDetailView from './components/CollegeDetailView';
 import SignIn from './components/SignIn';
 import AdminDashboard from './components/AdminDashboard';
 import CounselorDashboard from './components/CounselorDashboard';
+import AIResearch from './components/AIResearch';
 import Logo from './components/Logo';
 
 function App() {
@@ -136,6 +137,9 @@ function App() {
       case NavView.COUNSELOR_DASHBOARD:
           if (user?.role !== 'COUNSELOR') return <SignIn onLogin={handleLogin} onCancel={() => setCurrentView(NavView.HOME)} />;
           return <CounselorDashboard counselor={user} inquiries={inquiries} />;
+      
+      case NavView.AI_RESEARCH:
+          return <AIResearch />;
 
       case NavView.HOME:
       case NavView.COLLEGES:
@@ -151,15 +155,23 @@ function App() {
                   <h2 className="text-xl md:text-2xl font-bold mb-1">Find Your Perfect College Match</h2>
                   <p className="text-indigo-100 text-sm md:text-base">Get AI-powered advice on colleges, exams & more.</p>
                </div>
-               <button 
-                 onClick={() => {
-                     if (!user) setCurrentView(NavView.AUTH);
-                     else setCurrentView(NavView.INQUIRY);
-                 }}
-                 className="relative z-10 bg-white text-indigo-700 px-6 py-2.5 rounded-xl font-bold hover:bg-indigo-50 transition-all shadow-lg active:scale-95 text-sm md:text-base"
-               >
-                 Ask to College &rarr;
-               </button>
+               <div className="flex gap-2 relative z-10">
+                    <button 
+                        onClick={() => setCurrentView(NavView.AI_RESEARCH)}
+                        className="bg-white/20 backdrop-blur-md text-white px-6 py-2.5 rounded-xl font-bold hover:bg-white/30 transition-all border border-white/20"
+                    >
+                        Research
+                    </button>
+                    <button 
+                        onClick={() => {
+                            if (!user) setCurrentView(NavView.AUTH);
+                            else setCurrentView(NavView.INQUIRY);
+                        }}
+                        className="bg-white text-indigo-700 px-6 py-2.5 rounded-xl font-bold hover:bg-indigo-50 transition-all shadow-lg active:scale-95 text-sm md:text-base"
+                    >
+                        Inquire &rarr;
+                    </button>
+               </div>
             </div>
 
             {/* Sticky Search & Filters for Mobile Experience */}
@@ -416,13 +428,10 @@ function App() {
                 Colleges
               </button>
               <button 
-                onClick={() => {
-                    if (!user) setCurrentView(NavView.AUTH);
-                    else setCurrentView(NavView.INQUIRY);
-                }}
-                className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-all ${currentView === NavView.INQUIRY ? 'bg-white text-indigo-700 shadow-sm' : 'text-slate-500 hover:text-slate-900'}`}
+                onClick={() => setCurrentView(NavView.AI_RESEARCH)}
+                className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-all flex items-center gap-1.5 ${currentView === NavView.AI_RESEARCH ? 'bg-white text-indigo-700 shadow-sm' : 'text-slate-500 hover:text-slate-900'}`}
               >
-                Inquiry
+                <span>🔍</span> AI Search
               </button>
               <button 
                 onClick={() => setCurrentView(NavView.MAGIC_CAMPUS)}
@@ -485,9 +494,9 @@ function App() {
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
                 <span className="text-[10px] font-semibold">Home</span>
              </button>
-             <button onClick={() => user?.role === 'COUNSELOR' ? setCurrentView(NavView.COUNSELOR_DASHBOARD) : setCurrentView(NavView.INQUIRY)} className={`flex-1 flex flex-col items-center justify-center gap-1 h-full ${currentView === NavView.INQUIRY || currentView === NavView.COUNSELOR_DASHBOARD ? 'text-indigo-600' : 'text-slate-400'}`}>
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
-                <span className="text-[10px] font-semibold">{user?.role === 'COUNSELOR' ? 'Dash' : 'Ask'}</span>
+             <button onClick={() => setCurrentView(NavView.AI_RESEARCH)} className={`flex-1 flex flex-col items-center justify-center gap-1 h-full ${currentView === NavView.AI_RESEARCH ? 'text-indigo-600' : 'text-slate-400'}`}>
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                <span className="text-[10px] font-semibold">Search</span>
              </button>
              <button onClick={() => setCurrentView(NavView.MAGIC_CAMPUS)} className={`flex-1 flex flex-col items-center justify-center gap-1 h-full ${currentView === NavView.MAGIC_CAMPUS ? 'text-indigo-600' : 'text-slate-400'}`}>
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>

@@ -254,11 +254,19 @@ const LiveCounselor: React.FC<LiveCounselorProps> = ({ user }) => {
     if (activeSessionRef.current) {
         activeSessionRef.current = null;
     }
+    
+    // Proper AudioContext cleanup
     if (inputAudioContextRef.current) {
-        await inputAudioContextRef.current.close();
+        if (inputAudioContextRef.current.state !== 'closed') {
+           await inputAudioContextRef.current.close();
+        }
+        inputAudioContextRef.current = null;
     }
     if (outputAudioContextRef.current) {
-        await outputAudioContextRef.current.close();
+        if (outputAudioContextRef.current.state !== 'closed') {
+            await outputAudioContextRef.current.close();
+        }
+        outputAudioContextRef.current = null;
     }
     stopAudio();
     setIsConnected(false);

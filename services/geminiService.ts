@@ -114,3 +114,43 @@ export const generateCampusVideo = async (
     throw error;
   }
 };
+
+export interface SearchResult {
+    text: string;
+    sources: Array<{ title: string; uri: string }>;
+}
+
+export const searchCollegeInfo = async (query: string): Promise<SearchResult> => {
+    try {
+        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: query,
+            config: {
+                tools: [{ googleSearch: {} }],
+            },
+        });
+
+        const text = response.text || "No information found.";
+        const sources: Array<{ title: string; uri: string }> = [];
+
+        // Extract sources from grounding metadata
+        const chunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks;
+        if (chunks) {
+            chunks.forEach((chunk: any) => {
+                if (chunk.web) {
+                    sources.push({
+                        title: chunk.web.title || "Web Source",
+                        uri: chunk.web.uri
+                    });
+                }
+            });
+        }
+
+        return { text, sources };
+
+    } catch (error) {
+        console.error("Search grounding error:", error);
+        throw error;
+    }
+};

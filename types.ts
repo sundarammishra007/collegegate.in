@@ -22,6 +22,7 @@ export enum NavView {
   COLLEGES = 'COLLEGES',
   MAGIC_CAMPUS = 'MAGIC_CAMPUS', // Image Editing
   VOICE_LOUNGE = 'VOICE_LOUNGE', // Live API
+  AI_RESEARCH = 'AI_RESEARCH', // New Search Grounding
   PROFILE = 'PROFILE',
   REGISTER = 'REGISTER', // New Registration View
   COMPARE = 'COMPARE', // New Compare View
