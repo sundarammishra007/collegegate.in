@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { GoogleGenAI, LiveServerMessage, Modality, Blob } from '@google/genai';
-import { SYSTEM_INSTRUCTION_COUNSELOR } from '../constants';
+import { SYSTEM_INSTRUCTION_COUNSELOR, SYSTEM_INSTRUCTION_STUDENT } from '../constants';
 import { blobToBase64 } from '../services/geminiService';
+import { User } from '../types';
 
 // --- Audio Utilities (strictly following guide) ---
 
@@ -57,7 +58,11 @@ function createBlob(data: Float32Array): Blob {
 
 // --- Component ---
 
-const LiveCounselor: React.FC = () => {
+interface LiveCounselorProps {
+    user: User | null;
+}
+
+const LiveCounselor: React.FC<LiveCounselorProps> = ({ user }) => {
   const [isConnected, setIsConnected] = useState(false);
   const [isTalking, setIsTalking] = useState(false); // Model is talking
   const [error, setError] = useState<string | null>(null);
@@ -73,6 +78,8 @@ const LiveCounselor: React.FC = () => {
   const sessionRef = useRef<any>(null); // For cleanup
   const activeSessionRef = useRef<any>(null); // For sending user input
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const isTrainee = user?.role === 'TRAINEE';
 
   const stopAudio = useCallback(() => {
     // Stop all playing sources
@@ -91,9 +98,26 @@ const LiveCounselor: React.FC = () => {
     setIsTalking(false);
   }, []);
 
+  const ensureApiKey = async () => {
+      // Check for Google AI Studio Key Selection environment
+      if ((window as any).aistudio) {
+          try {
+              const hasKey = await (window as any).aistudio.hasSelectedApiKey();
+              if (!hasKey) {
+                  await (window as any).aistudio.openSelectKey();
+              }
+          } catch (e) {
+              console.error("API Key selection error:", e);
+              throw new Error("API Key selection process was interrupted.");
+          }
+      }
+  };
+
   const connectToLiveAPI = async () => {
     setError(null);
     try {
+      await ensureApiKey();
+      
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
       
       // Setup Audio Contexts
@@ -195,7 +219,7 @@ const LiveCounselor: React.FC = () => {
           },
           onerror: (e) => {
             console.error('Live API Error', e);
-            setError("Connection error. Please try again.");
+            setError("Connection failed. Please check your network or API key.");
             setIsConnected(false);
             activeSessionRef.current = null;
           }
@@ -203,9 +227,11 @@ const LiveCounselor: React.FC = () => {
         config: {
           responseModalities: [Modality.AUDIO],
           speechConfig: {
-            voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Zephyr' } }, // Friendly voice
+            // Use different voices for Counselor vs Student simulation
+            voiceConfig: { prebuiltVoiceConfig: { voiceName: isTrainee ? 'Puck' : 'Zephyr' } }, 
           },
-          systemInstruction: SYSTEM_INSTRUCTION_COUNSELOR,
+          // Select instruction based on user role
+          systemInstruction: isTrainee ? SYSTEM_INSTRUCTION_STUDENT : SYSTEM_INSTRUCTION_COUNSELOR,
         },
       });
 
@@ -226,7 +252,6 @@ const LiveCounselor: React.FC = () => {
         sessionRef.current = null;
     }
     if (activeSessionRef.current) {
-        // Explicitly close if the SDK supports it, though often implicit on disconnect
         activeSessionRef.current = null;
     }
     if (inputAudioContextRef.current) {
@@ -265,7 +290,7 @@ const LiveCounselor: React.FC = () => {
                 }
             });
 
-            setToastMessage("Document uploaded! The counselor is analyzing it...");
+            setToastMessage("Document uploaded! The AI is analyzing it...");
             setTimeout(() => setToastMessage(null), 3000);
             
             // Reset input
@@ -286,10 +311,17 @@ const LiveCounselor: React.FC = () => {
   }, []);
 
   return (
-    <div className="flex flex-col items-center justify-center h-full w-full bg-slate-900 rounded-3xl overflow-hidden relative shadow-2xl border border-slate-700">
+    <div className={`flex flex-col items-center justify-center h-full w-full rounded-3xl overflow-hidden relative shadow-2xl border ${isTrainee ? 'bg-slate-900 border-teal-500/50' : 'bg-slate-900 border-slate-700'}`}>
       
       {/* Background Ambience */}
-      <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/40 to-purple-900/40 z-0"></div>
+      <div className={`absolute inset-0 z-0 bg-gradient-to-br ${isTrainee ? 'from-teal-900/30 to-slate-900' : 'from-indigo-900/40 to-purple-900/40'}`}></div>
+
+      {/* Trainee Badge */}
+      {isTrainee && (
+          <div className="absolute top-4 right-4 z-20 bg-teal-500/20 border border-teal-500/30 text-teal-300 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">
+              Training Mode
+          </div>
+      )}
 
       {/* Toast Notification */}
       {toastMessage && (
@@ -303,18 +335,18 @@ const LiveCounselor: React.FC = () => {
         
         {/* Status Indicator */}
         <div className="relative">
-             <div className={`w-32 h-32 rounded-full flex items-center justify-center transition-all duration-500 ${isConnected ? 'bg-indigo-600/20' : 'bg-slate-700/20'}`}>
+             <div className={`w-32 h-32 rounded-full flex items-center justify-center transition-all duration-500 ${isConnected ? (isTrainee ? 'bg-teal-600/20' : 'bg-indigo-600/20') : 'bg-slate-700/20'}`}>
                 {isConnected ? (
                      <div className="relative w-full h-full flex items-center justify-center">
                         {/* Ripple Effect when talking */}
                         {isTalking && (
                             <>
-                                <div className="absolute w-full h-full rounded-full border-4 border-indigo-400 opacity-20 animate-ping"></div>
-                                <div className="absolute w-24 h-24 rounded-full border-4 border-indigo-300 opacity-40 animate-pulse"></div>
+                                <div className={`absolute w-full h-full rounded-full border-4 opacity-20 animate-ping ${isTrainee ? 'border-teal-400' : 'border-indigo-400'}`}></div>
+                                <div className={`absolute w-24 h-24 rounded-full border-4 opacity-40 animate-pulse ${isTrainee ? 'border-teal-300' : 'border-indigo-300'}`}></div>
                             </>
                         )}
-                        <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 shadow-lg flex items-center justify-center">
-                            <span className="text-4xl">🎙️</span>
+                        <div className={`w-20 h-20 rounded-full shadow-lg flex items-center justify-center bg-gradient-to-tr ${isTrainee ? 'from-teal-500 to-emerald-500' : 'from-indigo-500 to-purple-500'}`}>
+                            <span className="text-4xl">{isTrainee ? '🎓' : '🎙️'}</span>
                         </div>
                      </div>
                 ) : (
@@ -326,13 +358,17 @@ const LiveCounselor: React.FC = () => {
         </div>
 
         <div>
-            <h2 className="text-2xl font-bold text-white mb-2">Anonymous Voice Lounge</h2>
+            <h2 className="text-2xl font-bold text-white mb-2">
+                {isTrainee ? 'Practice Session' : 'Anonymous Voice Lounge'}
+            </h2>
             <p className="text-slate-400 max-w-xs mx-auto">
                 {isConnected 
-                    ? isTalking ? "Counselor is speaking..." : "Listening... (Speak or Upload Doc)" 
-                    : "Connect privately with our AI Counselor regarding colleges, fees, or exams."}
+                    ? isTalking 
+                        ? (isTrainee ? "AI Student is asking..." : "Counselor is speaking...") 
+                        : "Listening... (Speak or Upload Doc)" 
+                    : (isTrainee ? "Start a mock session with an AI student to practice your skills." : "Connect privately with our AI Counselor regarding colleges, fees, or exams.")}
             </p>
-            {error && <p className="text-red-400 mt-2 text-sm">{error}</p>}
+            {error && <p className="text-red-400 mt-2 text-sm bg-red-900/20 p-2 rounded-lg border border-red-500/20">{error}</p>}
         </div>
 
         <div className="flex flex-col gap-4 w-full">
@@ -341,10 +377,10 @@ const LiveCounselor: React.FC = () => {
                 className={`w-full px-8 py-4 rounded-full font-semibold text-lg transition-all transform hover:scale-105 shadow-xl ${
                     isConnected 
                     ? 'bg-red-500 hover:bg-red-600 text-white' 
-                    : 'bg-indigo-600 hover:bg-indigo-500 text-white'
+                    : (isTrainee ? 'bg-teal-600 hover:bg-teal-500 text-white' : 'bg-indigo-600 hover:bg-indigo-500 text-white')
                 }`}
             >
-                {isConnected ? 'End Call' : 'Start Anonymous Call'}
+                {isConnected ? 'End Call' : (isTrainee ? 'Start Practice Session' : 'Start Anonymous Call')}
             </button>
             
             {/* Document Upload Button - Only visible when connected */}
@@ -361,9 +397,9 @@ const LiveCounselor: React.FC = () => {
                     className="w-full px-6 py-3 rounded-xl font-medium text-indigo-200 bg-white/10 hover:bg-white/20 border border-white/10 transition-colors flex items-center justify-center gap-2"
                 >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                    Show Resume / Transcript
+                    Show Document / Resume
                 </button>
-                <p className="text-[10px] text-slate-500 mt-2">Upload an image of your document for the counselor to read.</p>
+                <p className="text-[10px] text-slate-500 mt-2">Upload a document for context.</p>
             </div>
         </div>
 

@@ -39,7 +39,7 @@ export interface Message {
   timestamp: Date;
 }
 
-export type UserRole = 'STUDENT' | 'COUNSELOR' | 'ADMIN';
+export type UserRole = 'STUDENT' | 'COUNSELOR' | 'ADMIN' | 'TRAINEE';
 
 export interface User {
   id: string;

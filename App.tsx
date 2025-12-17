@@ -41,6 +41,8 @@ function App() {
         setCurrentView(NavView.ADMIN_DASHBOARD);
     } else if (loggedInUser.role === 'COUNSELOR') {
         setCurrentView(NavView.COUNSELOR_DASHBOARD);
+    } else if (loggedInUser.role === 'TRAINEE') {
+         setCurrentView(NavView.VOICE_LOUNGE); // Trainees go straight to practice
     } else {
         // Student goes home or back to where they were
         setCurrentView(NavView.HOME);
@@ -351,18 +353,18 @@ function App() {
         return <MagicCampus />;
       case NavView.VOICE_LOUNGE:
         // Role check
-        if (!user || user.role !== 'STUDENT') {
+        if (!user || (user.role !== 'STUDENT' && user.role !== 'TRAINEE')) {
              return (
                  <div className="flex items-center justify-center h-[60vh] flex-col p-8 text-center">
-                     <h2 className="text-2xl font-bold mb-4">Student Access Only</h2>
-                     <p className="text-slate-500 mb-6">Please sign in as a student to access the anonymous counselor.</p>
+                     <h2 className="text-2xl font-bold mb-4">Student & Trainee Access Only</h2>
+                     <p className="text-slate-500 mb-6">Please sign in as a Student or Trainee to access the Voice Lounge.</p>
                      <button onClick={() => setCurrentView(NavView.AUTH)} className="bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold">Sign In</button>
                  </div>
              )
         }
         return (
             <div className="h-[calc(100vh-140px)] md:h-[calc(100vh-160px)] p-4 max-w-4xl mx-auto">
-                <LiveCounselor />
+                <LiveCounselor user={user} />
             </div>
         );
       case NavView.REGISTER:

@@ -55,7 +55,7 @@ const MagicCampus: React.FC = () => {
               }
           } catch (e) {
               console.error("API Key selection error:", e);
-              throw new Error("Could not verify API key selection.");
+              throw new Error("API Key selection process was interrupted or failed.");
           }
       }
   };
@@ -68,26 +68,46 @@ const MagicCampus: React.FC = () => {
     if (err instanceof Error) {
         const rawMsg = err.message || "";
         
-        if (rawMsg.includes("403") || rawMsg.includes("API key")) {
+        // 1. Network / Offline
+        if (!navigator.onLine) {
+             title = "No Internet Connection";
+             msg = "Please check your network connection and try again.";
+        }
+        // 2. Auth / API Key
+        else if (rawMsg.includes("403") || rawMsg.includes("API key") || rawMsg.includes("PERMISSION_DENIED")) {
             title = "Authentication Error";
-            msg = "Access denied. Please ensure a valid API key is selected via the settings.";
-        } else if (rawMsg.includes("429") || rawMsg.includes("quota") || rawMsg.includes("Resource has been exhausted")) {
-             title = "API Limit Exceeded";
-             msg = "You have reached the usage limit for the API. Please wait a while before trying again.";
-        } else if (rawMsg.includes("503") || rawMsg.includes("overloaded")) {
-             title = "Service Unavailable";
-             msg = "The AI service is currently busy due to high traffic. Please wait a moment and try again.";
-        } else if (rawMsg.includes("SAFETY") || rawMsg.includes("blocked") || rawMsg.includes("safety")) {
-             title = "Content Policy Violation";
-             msg = "The generation was blocked by safety filters. Please try a different, more neutral prompt.";
-        } else if (rawMsg.includes("Requested entity was not found")) {
+            msg = type === 'video' 
+                ? "Access denied. Video generation requires a paid API key. Please ensure you have selected a valid key associated with a billing-enabled project."
+                : "Access denied. Please check your API key configuration.";
+        } 
+        // 3. Quota / Limits
+        else if (rawMsg.includes("429") || rawMsg.includes("quota") || rawMsg.includes("exhausted")) {
+             title = "Usage Limit Reached";
+             msg = "You have reached the usage limit for the API. Please wait a minute before trying again.";
+        } 
+        // 4. Server / Overload
+        else if (rawMsg.includes("503") || rawMsg.includes("overloaded") || rawMsg.includes("unavailable")) {
+             title = "Service Busy";
+             msg = "The AI service is currently experiencing high traffic. Please try again in a few moments.";
+        } 
+        // 5. Content Safety
+        else if (rawMsg.includes("SAFETY") || rawMsg.includes("blocked") || rawMsg.includes("safety") || rawMsg.includes("finishReason")) {
+             title = "Content Filtered";
+             msg = "The generation was blocked by safety guidelines. Please try a different, more neutral prompt or image.";
+        } 
+        // 6. Session / Entity Not Found (Veo specific usually)
+        else if (rawMsg.includes("Requested entity was not found") || rawMsg.includes("404")) {
              title = "Session Expired";
-             msg = "Your session or API key might have expired. Please refresh the page and try again.";
-        } else if (rawMsg.includes("400") || rawMsg.includes("INVALID_ARGUMENT") || rawMsg.includes("valid")) {
+             msg = "Your API key session may have expired. Please refresh the page to re-select your key.";
+        } 
+        // 7. Bad Request / Invalid Args
+        else if (rawMsg.includes("400") || rawMsg.includes("INVALID_ARGUMENT") || rawMsg.includes("valid")) {
             title = "Invalid Input";
-            msg = "The input provided was invalid. Please check your prompt or image format.";
-        } else {
-            msg = rawMsg;
+            msg = "The input provided was invalid. Please check your prompt or ensure the image format is supported (JPEG/PNG).";
+        } 
+        // 8. Generic fallback with meaningful message
+        else if (rawMsg.length > 0 && rawMsg.length < 200) {
+            msg = `Error details: ${rawMsg}`;
         }
     }
     
@@ -106,7 +126,7 @@ const MagicCampus: React.FC = () => {
       if (result) {
         setGeneratedImage(result);
       } else {
-        setError({ title: "Generation Failed", message: "The AI model could not generate an image. Try a simpler prompt." });
+        setError({ title: "Generation Incomplete", message: "The AI processed the request but returned no image. This might happen if the safety filters blocked the output or the model couldn't interpret the instructions." });
       }
     } catch (err) {
       handleApiError(err, 'image');
@@ -138,7 +158,7 @@ const MagicCampus: React.FC = () => {
         if (resultUrl) {
             setGeneratedVideo(resultUrl);
         } else {
-            setError({ title: "Video Generation Failed", message: "The service did not return a valid video. Please try again." });
+            setError({ title: "Video Generation Failed", message: "The service did not return a valid video. This may happen due to high demand or complex prompts. Please try again." });
         }
     } catch (err) {
         handleApiError(err, 'video');
@@ -291,15 +311,23 @@ const MagicCampus: React.FC = () => {
             )}
             
             {error && (
-                <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3 animate-fade-in">
-                    <div className="bg-red-100 p-2 rounded-full text-red-600">
+                <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3 animate-fade-in shadow-sm">
+                    <div className="bg-red-100 p-2 rounded-full text-red-600 flex-shrink-0">
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                         </svg>
                     </div>
                     <div>
                         <h4 className="text-sm font-bold text-red-800">{error.title}</h4>
-                        <p className="text-sm text-red-600 mt-0.5">{error.message}</p>
+                        <p className="text-sm text-red-700 mt-1 leading-relaxed">{error.message}</p>
+                        {error.title === "Session Expired" && (
+                            <button 
+                                onClick={() => window.location.reload()}
+                                className="mt-2 text-xs font-bold text-red-700 underline hover:text-red-900"
+                            >
+                                Refresh Page
+                            </button>
+                        )}
                     </div>
                 </div>
             )}
