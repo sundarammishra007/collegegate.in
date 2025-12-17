@@ -12,13 +12,32 @@ const SignIn: React.FC<SignInProps> = ({ onLogin, onCancel }) => {
     name: '',
     email: '',
     password: '',
+    mobile: '',
+    whatsapp: '',
     specialization: '' // Only for counselor
   });
+  const [sameAsMobile, setSameAsMobile] = useState(false);
   const [error, setError] = useState('');
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData(prev => {
+        const newData = { ...prev, [name]: value };
+        // If "Same as Mobile" is checked and we are updating mobile, update whatsapp too
+        if (name === 'mobile' && sameAsMobile) {
+            newData.whatsapp = value;
+        }
+        return newData;
+    });
     setError('');
+  };
+
+  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const isChecked = e.target.checked;
+      setSameAsMobile(isChecked);
+      if (isChecked) {
+          setFormData(prev => ({ ...prev, whatsapp: prev.mobile }));
+      }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -26,8 +45,15 @@ const SignIn: React.FC<SignInProps> = ({ onLogin, onCancel }) => {
     
     // Basic validation
     if (!formData.email || !formData.password || !formData.name) {
-        setError("All fields are required.");
+        setError("Name, Email and Password are required.");
         return;
+    }
+
+    if (activeTab !== 'ADMIN') {
+        if (!formData.mobile) {
+            setError("Mobile number is required.");
+            return;
+        }
     }
 
     if (activeTab === 'ADMIN' && formData.password !== 'admin123') {
@@ -58,6 +84,8 @@ const SignIn: React.FC<SignInProps> = ({ onLogin, onCancel }) => {
             name: formData.name,
             email: formData.email,
             role: activeTab,
+            mobile: formData.mobile,
+            whatsapp: formData.whatsapp || formData.mobile, // Fallback to mobile if not provided
             timestamp: new Date().toLocaleString(),
             specialization: activeTab === 'COUNSELOR' ? formData.specialization : undefined,
             studentId: activeTab === 'STUDENT' ? `ST-${Math.floor(Math.random() * 10000)}` : undefined,
@@ -72,7 +100,7 @@ const SignIn: React.FC<SignInProps> = ({ onLogin, onCancel }) => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-[80vh] px-4">
+    <div className="flex items-center justify-center min-h-[80vh] px-4 py-8">
         <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border border-slate-200">
             
             {/* Header / Tabs */}
@@ -105,9 +133,9 @@ const SignIn: React.FC<SignInProps> = ({ onLogin, onCancel }) => {
                         {activeTab === 'ADMIN' && 'Admin Access'}
                     </h2>
                     <p className="text-sm text-slate-500 mt-1">
-                        {activeTab === 'STUDENT' && 'Access AI tools and connect with counselors anonymously.'}
+                        {activeTab === 'STUDENT' && 'Access AI tools and connect with counselors.'}
                         {activeTab === 'COUNSELOR' && 'Manage inquiries and guide students.'}
-                        {activeTab === 'ADMIN' && 'View user logs and platform statistics.'}
+                        {activeTab === 'ADMIN' && 'Platform administration.'}
                     </p>
                 </div>
 
@@ -137,6 +165,48 @@ const SignIn: React.FC<SignInProps> = ({ onLogin, onCancel }) => {
                             placeholder="name@example.com"
                         />
                     </div>
+
+                    {/* Contact Details (Visible for Student & Counselor) */}
+                    {activeTab !== 'ADMIN' && (
+                        <>
+                            <div className="grid grid-cols-1 gap-4">
+                                <div>
+                                    <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Mobile Number</label>
+                                    <input 
+                                        name="mobile"
+                                        type="tel" 
+                                        value={formData.mobile}
+                                        onChange={handleInputChange}
+                                        className="w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none"
+                                        placeholder="+91 98765 43210"
+                                    />
+                                </div>
+                                <div>
+                                    <div className="flex items-center justify-between mb-1">
+                                        <label className="block text-xs font-bold text-slate-500 uppercase">WhatsApp Number</label>
+                                        <label className="flex items-center gap-1 cursor-pointer">
+                                            <input 
+                                                type="checkbox" 
+                                                checked={sameAsMobile} 
+                                                onChange={handleCheckboxChange}
+                                                className="rounded text-indigo-600 focus:ring-indigo-500 w-3 h-3"
+                                            />
+                                            <span className="text-[10px] text-slate-500">Same as Mobile</span>
+                                        </label>
+                                    </div>
+                                    <input 
+                                        name="whatsapp"
+                                        type="tel" 
+                                        value={formData.whatsapp}
+                                        onChange={handleInputChange}
+                                        disabled={sameAsMobile}
+                                        className={`w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none ${sameAsMobile ? 'bg-slate-50 text-slate-400' : ''}`}
+                                        placeholder="Alternate / WhatsApp No"
+                                    />
+                                </div>
+                            </div>
+                        </>
+                    )}
 
                     {activeTab === 'COUNSELOR' && (
                         <div>
@@ -172,7 +242,7 @@ const SignIn: React.FC<SignInProps> = ({ onLogin, onCancel }) => {
                             'bg-slate-800 hover:bg-slate-900 shadow-slate-300'
                         }`}
                     >
-                        Sign In
+                        {activeTab === 'ADMIN' ? 'Admin Login' : 'Register / Login'}
                     </button>
                 </form>
 

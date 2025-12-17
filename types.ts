@@ -46,6 +46,8 @@ export interface User {
   name: string;
   email: string;
   role: UserRole;
+  mobile?: string;
+  whatsapp?: string;
   specialization?: string; // For counselors
   studentId?: string; // For students
   timestamp: string;
