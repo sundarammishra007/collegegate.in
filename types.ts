@@ -20,15 +20,16 @@ export interface College {
 export enum NavView {
   HOME = 'HOME',
   COLLEGES = 'COLLEGES',
-  MAGIC_CAMPUS = 'MAGIC_CAMPUS', // Image Editing
-  VOICE_LOUNGE = 'VOICE_LOUNGE', // Live API
-  AI_RESEARCH = 'AI_RESEARCH', // New Search Grounding
+  MAGIC_CAMPUS = 'MAGIC_CAMPUS',
+  VOICE_LOUNGE = 'VOICE_LOUNGE',
+  AI_RESEARCH = 'AI_RESEARCH',
+  SKILLS = 'SKILLS', // New Learning Section
   PROFILE = 'PROFILE',
-  REGISTER = 'REGISTER', // New Registration View
-  COMPARE = 'COMPARE', // New Compare View
-  INQUIRY = 'INQUIRY',  // New Ask to College View
-  DETAIL = 'DETAIL', // New College Detail View
-  AUTH = 'AUTH', // Sign In
+  REGISTER = 'REGISTER',
+  COMPARE = 'COMPARE',
+  INQUIRY = 'INQUIRY',
+  DETAIL = 'DETAIL',
+  AUTH = 'AUTH',
   ADMIN_DASHBOARD = 'ADMIN_DASHBOARD',
   COUNSELOR_DASHBOARD = 'COUNSELOR_DASHBOARD'
 }
@@ -49,15 +50,15 @@ export interface User {
   role: UserRole;
   mobile?: string;
   whatsapp?: string;
-  specialization?: string; // For counselors
-  studentId?: string; // For students
+  specialization?: string;
+  studentId?: string;
   timestamp: string;
   banned?: boolean;
 }
 
 export interface Inquiry {
   id: string;
-  studentName: string; // Displayed as Anonymous to counselor if needed
+  studentName: string;
   studentId: string;
   course: string;
   query: string;

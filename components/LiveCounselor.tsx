@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { GoogleGenAI, LiveServerMessage, Modality, Blob } from '@google/genai';
+import { GoogleGenAI, LiveServerMessage, Modality, Blob, Type, FunctionDeclaration } from '@google/genai';
 import { SYSTEM_INSTRUCTION_COUNSELOR, SYSTEM_INSTRUCTION_STUDENT } from '../constants';
 import { blobToBase64 } from '../services/geminiService';
 import { User } from '../types';
 
-// --- Audio Utilities (strictly following guide) ---
+// --- Audio Utilities ---
 
 function decode(base64: string) {
   const binaryString = atob(base64);
@@ -67,6 +67,9 @@ const LiveCounselor: React.FC<LiveCounselorProps> = ({ user }) => {
   const [isTalking, setIsTalking] = useState(false); // Model is talking
   const [error, setError] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [callDuration, setCallDuration] = useState(0);
+  const [hasPromptedExpert, setHasPromptedExpert] = useState(false);
+  const [generatedImages, setGeneratedImages] = useState<string[]>([]);
   
   // Audio Context Refs
   const inputAudioContextRef = useRef<AudioContext | null>(null);
@@ -81,341 +84,355 @@ const LiveCounselor: React.FC<LiveCounselorProps> = ({ user }) => {
 
   const isTrainee = user?.role === 'TRAINEE';
 
+  // Timer logic for call duration and expert prompt
+  useEffect(() => {
+    let interval: number | undefined;
+    if (isConnected) {
+      interval = window.setInterval(() => {
+        setCallDuration(prev => {
+            const next = prev + 1;
+            // Trigger expert suggestion at 60 seconds
+            if (next === 60 && !hasPromptedExpert && activeSessionRef.current) {
+                // We send a text message to the model to prompt it to ask the question naturally
+                activeSessionRef.current.sendRealtimeInput({
+                    text: "[SYSTEM: It has been 1 minute. Politely ask: 'If you don't mind, I can connect you to our expert guide of CollegeGate to assist you better.']"
+                });
+                setHasPromptedExpert(true);
+            }
+            return next;
+        });
+      }, 1000);
+    } else {
+      setCallDuration(0);
+      setHasPromptedExpert(false);
+      if (interval) clearInterval(interval);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isConnected, hasPromptedExpert]);
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
   const stopAudio = useCallback(() => {
-    // Stop all playing sources
     if (sourcesRef.current) {
         for (const source of sourcesRef.current.values()) {
-            try {
-                source.stop();
-            } catch (e) {
-                // Ignore errors if already stopped
-            }
+            try { source.stop(); } catch (e) {}
             sourcesRef.current.delete(source);
         }
     }
-    // Reset timing
     nextStartTimeRef.current = 0;
     setIsTalking(false);
   }, []);
 
   const ensureApiKey = async () => {
-      // Check for Google AI Studio Key Selection environment
       if ((window as any).aistudio) {
           try {
               const hasKey = await (window as any).aistudio.hasSelectedApiKey();
-              if (!hasKey) {
-                  await (window as any).aistudio.openSelectKey();
-              }
+              if (!hasKey) { await (window as any).aistudio.openSelectKey(); }
           } catch (e) {
               console.error("API Key selection error:", e);
-              throw new Error("API Key selection process was interrupted.");
+              throw new Error("API Key selection failed.");
           }
       }
+  };
+
+  const generateCollegeImageTool: FunctionDeclaration = {
+    name: 'generateCollegeImage',
+    parameters: {
+      type: Type.OBJECT,
+      description: 'Generates an image of a college campus or building based on a description.',
+      properties: {
+        prompt: {
+          type: Type.STRING,
+          description: 'A detailed description of the campus or building to visualize.',
+        },
+      },
+      required: ['prompt'],
+    },
+  };
+
+  const handleImageGeneration = async (prompt: string) => {
+    try {
+        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash-image',
+            contents: { parts: [{ text: `Photorealistic college campus visualization: ${prompt}` }] },
+        });
+
+        for (const part of response.candidates[0].content.parts) {
+            if (part.inlineData) {
+                const b64 = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+                setGeneratedImages(prev => [b64, ...prev]);
+                return "Image generated successfully.";
+            }
+        }
+        return "Image generation failed.";
+    } catch (err) {
+        console.error("Tool execution failed:", err);
+        return "Error occurred during image generation.";
+    }
   };
 
   const connectToLiveAPI = async () => {
     setError(null);
     try {
       await ensureApiKey();
-      
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
       
-      // Setup Audio Contexts
       const inputCtx = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 16000 });
       const outputCtx = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
       
       inputAudioContextRef.current = inputCtx;
       outputAudioContextRef.current = outputCtx;
       const outputNode = outputCtx.createGain();
-      outputNode.connect(outputCtx.destination); // Ensure output connects to speakers
+      outputNode.connect(outputCtx.destination);
 
-      // Get Mic Stream
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       
       const sessionPromise = ai.live.connect({
         model: 'gemini-2.5-flash-native-audio-preview-09-2025',
         callbacks: {
           onopen: () => {
-            console.log('Live Session Opened');
             setIsConnected(true);
-            
-            // Stream audio from the microphone to the model.
             const source = inputCtx.createMediaStreamSource(stream);
             const scriptProcessor = inputCtx.createScriptProcessor(4096, 1, 1);
             
             scriptProcessor.onaudioprocess = (audioProcessingEvent) => {
               const inputData = audioProcessingEvent.inputBuffer.getChannelData(0);
               const pcmBlob = createBlob(inputData);
-              
               sessionPromise.then((session) => {
                 session.sendRealtimeInput({ media: pcmBlob });
               });
             };
-            
             source.connect(scriptProcessor);
             scriptProcessor.connect(inputCtx.destination);
             
-            // Store cleanup function for mic
             sessionRef.current = {
                close: async () => {
                  scriptProcessor.disconnect();
                  source.disconnect();
                  stream.getTracks().forEach(t => t.stop());
-                 // @ts-ignore
-                 const session = await sessionPromise;
-                 // session.close() is typically handled by the caller or implicitly
                }
             };
           },
           onmessage: async (message: LiveServerMessage) => {
-            // Handle Audio Output
+            if (message.toolCall) {
+                for (const fc of message.toolCall.functionCalls) {
+                    if (fc.name === 'generateCollegeImage') {
+                        const res = await handleImageGeneration(fc.args.prompt as string);
+                        sessionPromise.then((session) => {
+                            session.sendToolResponse({
+                                functionResponses: {
+                                    id: fc.id,
+                                    name: fc.name,
+                                    response: { result: res },
+                                }
+                            });
+                        });
+                    }
+                }
+            }
+
             const base64Audio = message.serverContent?.modelTurn?.parts[0]?.inlineData?.data;
             if (base64Audio) {
               setIsTalking(true);
-              // Ensure output context is running (browsers block autoplay)
-              if (outputCtx.state === 'suspended') {
-                  await outputCtx.resume();
-              }
-
-              nextStartTimeRef.current = Math.max(
-                nextStartTimeRef.current,
-                outputCtx.currentTime
-              );
+              if (outputCtx.state === 'suspended') await outputCtx.resume();
+              nextStartTimeRef.current = Math.max(nextStartTimeRef.current, outputCtx.currentTime);
               
-              const audioBuffer = await decodeAudioData(
-                decode(base64Audio),
-                outputCtx,
-                24000,
-                1
-              );
-              
+              const audioBuffer = await decodeAudioData(decode(base64Audio), outputCtx, 24000, 1);
               const source = outputCtx.createBufferSource();
               source.buffer = audioBuffer;
               source.connect(outputNode);
               source.addEventListener('ended', () => {
                 sourcesRef.current.delete(source);
-                if (sourcesRef.current.size === 0) {
-                    setIsTalking(false);
-                }
+                if (sourcesRef.current.size === 0) setIsTalking(false);
               });
-              
               source.start(nextStartTimeRef.current);
               nextStartTimeRef.current += audioBuffer.duration;
               sourcesRef.current.add(source);
             }
 
-            // Handle Interruptions
-            const interrupted = message.serverContent?.interrupted;
-            if (interrupted) {
-              console.log("Model interrupted");
-              stopAudio();
-            }
+            if (message.serverContent?.interrupted) stopAudio();
           },
-          onclose: () => {
-            console.log('Live Session Closed');
-            setIsConnected(false);
-            setIsTalking(false);
-            activeSessionRef.current = null;
-          },
-          onerror: (e) => {
-            console.error('Live API Error', e);
-            setError("Connection failed. Please check your network or API key.");
-            setIsConnected(false);
-            activeSessionRef.current = null;
-          }
+          onclose: () => { setIsConnected(false); setIsTalking(false); activeSessionRef.current = null; },
+          onerror: (e) => { setError("Connection failed."); setIsConnected(false); }
         },
         config: {
           responseModalities: [Modality.AUDIO],
           speechConfig: {
-            // Use different voices for Counselor vs Student simulation
             voiceConfig: { prebuiltVoiceConfig: { voiceName: isTrainee ? 'Puck' : 'Zephyr' } }, 
           },
-          // Select instruction based on user role
+          tools: [{ functionDeclarations: [generateCollegeImageTool] }],
           systemInstruction: isTrainee ? SYSTEM_INSTRUCTION_STUDENT : SYSTEM_INSTRUCTION_COUNSELOR,
         },
       });
 
-      // Capture active session for external inputs (file uploads)
-      sessionPromise.then(s => {
-          activeSessionRef.current = s;
-      });
+      sessionPromise.then(s => { activeSessionRef.current = s; });
       
     } catch (err: any) {
-      console.error(err);
       setError(err.message || "Failed to start audio session");
     }
   };
 
   const disconnect = async () => {
-    if (sessionRef.current) {
-        await sessionRef.current.close();
-        sessionRef.current = null;
-    }
-    if (activeSessionRef.current) {
-        activeSessionRef.current = null;
-    }
-    
-    // Proper AudioContext cleanup
-    if (inputAudioContextRef.current) {
-        if (inputAudioContextRef.current.state !== 'closed') {
-           await inputAudioContextRef.current.close();
-        }
-        inputAudioContextRef.current = null;
-    }
-    if (outputAudioContextRef.current) {
-        if (outputAudioContextRef.current.state !== 'closed') {
-            await outputAudioContextRef.current.close();
-        }
-        outputAudioContextRef.current = null;
-    }
+    if (sessionRef.current) await sessionRef.current.close();
+    if (inputAudioContextRef.current) await inputAudioContextRef.current.close();
+    if (outputAudioContextRef.current) await outputAudioContextRef.current.close();
     stopAudio();
     setIsConnected(false);
+    setGeneratedImages([]);
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!isConnected || !activeSessionRef.current) {
-        setError("Please start the call first.");
-        return;
-    }
-
+    if (!isConnected || !activeSessionRef.current) return;
     if (e.target.files && e.target.files[0]) {
         const file = e.target.files[0];
-        
-        // Simple check for image types
-        if (!file.type.startsWith('image/')) {
-            setError("Please upload an image file (JPEG/PNG) of your document.");
-            return;
-        }
-
         try {
             const base64 = await blobToBase64(file);
-            
-            // Send image to the active session
             await activeSessionRef.current.sendRealtimeInput({
-                media: { 
-                    mimeType: file.type, 
-                    data: base64 
-                }
+                media: { mimeType: file.type, data: base64 }
             });
-
-            setToastMessage("Document uploaded! The AI is analyzing it...");
+            setToastMessage("Analyzing document...");
             setTimeout(() => setToastMessage(null), 3000);
-            
-            // Reset input
-            if (fileInputRef.current) fileInputRef.current.value = '';
-
-        } catch (err) {
-            console.error("Upload error:", err);
-            setError("Failed to upload document.");
-        }
+        } catch (err) { setError("Failed to upload document."); }
     }
   };
 
-  useEffect(() => {
-    return () => {
-      disconnect();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   return (
-    <div className={`flex flex-col items-center justify-center h-full w-full rounded-3xl overflow-hidden relative shadow-2xl border ${isTrainee ? 'bg-slate-900 border-teal-500/50' : 'bg-slate-900 border-slate-700'}`}>
+    <div className={`flex flex-col md:flex-row h-full w-full rounded-3xl overflow-hidden relative shadow-2xl border transition-all duration-500 ${isTrainee ? 'bg-slate-900 border-teal-500/30' : 'bg-slate-950 border-slate-800'}`}>
       
-      {/* Background Ambience */}
-      <div className={`absolute inset-0 z-0 bg-gradient-to-br ${isTrainee ? 'from-teal-900/30 to-slate-900' : 'from-indigo-900/40 to-purple-900/40'}`}></div>
+      <div className={`absolute inset-0 z-0 bg-gradient-to-br ${isTrainee ? 'from-teal-900/20 to-slate-950' : 'from-indigo-950 to-slate-950'}`}></div>
 
-      {/* Trainee Badge */}
-      {isTrainee && (
-          <div className="absolute top-4 right-4 z-20 bg-teal-500/20 border border-teal-500/30 text-teal-300 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">
-              Training Mode
-          </div>
-      )}
-
-      {/* Toast Notification */}
-      {toastMessage && (
-          <div className="absolute top-6 left-1/2 transform -translate-x-1/2 bg-emerald-600/90 text-white px-4 py-2 rounded-full text-sm font-medium backdrop-blur-md shadow-lg z-50 animate-bounce-in flex items-center gap-2">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-              {toastMessage}
-          </div>
-      )}
-
-      <div className="z-10 flex flex-col items-center text-center p-8 space-y-8 w-full max-w-md">
+      {/* Main Content Area */}
+      <div className={`flex-grow z-10 flex flex-col items-center text-center p-8 space-y-8 relative overflow-y-auto ${generatedImages.length > 0 ? 'md:w-2/3' : 'w-full'}`}>
         
-        {/* Status Indicator */}
-        <div className="relative">
-             <div className={`w-32 h-32 rounded-full flex items-center justify-center transition-all duration-500 ${isConnected ? (isTrainee ? 'bg-teal-600/20' : 'bg-indigo-600/20') : 'bg-slate-700/20'}`}>
-                {isConnected ? (
-                     <div className="relative w-full h-full flex items-center justify-center">
-                        {/* Ripple Effect when talking */}
-                        {isTalking && (
-                            <>
-                                <div className={`absolute w-full h-full rounded-full border-4 opacity-20 animate-ping ${isTrainee ? 'border-teal-400' : 'border-indigo-400'}`}></div>
-                                <div className={`absolute w-24 h-24 rounded-full border-4 opacity-40 animate-pulse ${isTrainee ? 'border-teal-300' : 'border-indigo-300'}`}></div>
-                            </>
-                        )}
-                        <div className={`w-20 h-20 rounded-full shadow-lg flex items-center justify-center bg-gradient-to-tr ${isTrainee ? 'from-teal-500 to-emerald-500' : 'from-indigo-500 to-purple-500'}`}>
-                            <span className="text-4xl">{isTrainee ? '🎓' : '🎙️'}</span>
-                        </div>
-                     </div>
-                ) : (
-                    <div className="w-20 h-20 rounded-full bg-slate-700 flex items-center justify-center shadow-inner">
-                        <span className="text-4xl text-slate-500">📵</span>
+        {isTrainee && (
+            <div className="absolute top-4 right-4 bg-teal-500/10 border border-teal-500/20 text-teal-400 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest backdrop-blur-sm">
+                Training Mode
+            </div>
+        )}
+
+        {isConnected && (
+            <div className="absolute top-4 left-4 flex items-center gap-2 bg-black/40 backdrop-blur-md border border-white/10 px-3 py-1.5 rounded-full text-white">
+                <div className={`w-2 h-2 rounded-full ${isTalking ? 'bg-red-500 animate-pulse' : 'bg-green-500'}`}></div>
+                <span className="text-sm font-mono font-bold tracking-wider">{formatTime(callDuration)}</span>
+            </div>
+        )}
+
+        {toastMessage && (
+            <div className="absolute top-6 left-1/2 transform -translate-x-1/2 bg-emerald-600/90 text-white px-4 py-2 rounded-full text-sm font-medium backdrop-blur-md shadow-lg z-50 flex items-center gap-2">
+                {toastMessage}
+            </div>
+        )}
+
+        <div className="relative mt-8">
+             {/* Visual Speaking Indicator */}
+             <div className={`w-40 h-40 rounded-full flex items-center justify-center transition-all duration-700 relative ${isConnected ? (isTrainee ? 'bg-teal-500/5' : 'bg-indigo-500/5') : 'bg-slate-800/20'}`}>
+                
+                {isConnected && (
+                    <div className="absolute inset-0 pointer-events-none">
+                        {/* Pulse layers for when AI speaks */}
+                        <div className={`absolute inset-0 rounded-full border-2 opacity-30 ${isTalking ? 'animate-[ping_2s_infinite]' : 'opacity-0'} ${isTrainee ? 'border-teal-400' : 'border-indigo-400'}`}></div>
+                        <div className={`absolute inset-4 rounded-full border-2 opacity-20 ${isTalking ? 'animate-[ping_3s_infinite]' : 'opacity-0'} ${isTrainee ? 'border-teal-300' : 'border-indigo-300'}`}></div>
+                    </div>
+                )}
+
+                <div className={`w-24 h-24 rounded-full shadow-2xl flex items-center justify-center bg-gradient-to-tr transition-all duration-500 ${isTalking ? 'scale-110' : 'scale-100'} ${
+                    isConnected 
+                    ? (isTrainee ? 'from-teal-500 to-emerald-600 shadow-teal-500/30' : 'from-indigo-600 to-purple-700 shadow-indigo-500/30')
+                    : 'from-slate-800 to-slate-900 opacity-40'
+                }`}>
+                    <span className="text-5xl">{isConnected ? (isTrainee ? '🎓' : '🎙️') : '📵'}</span>
+                </div>
+                
+                {/* Micro Equalizer Bar Animation */}
+                {isTalking && (
+                    <div className="absolute -bottom-6 flex items-end gap-1 h-8">
+                        {[1,2,3,4,5].map(i => (
+                            <div 
+                                key={i} 
+                                className={`w-1 rounded-full animate-bounce ${isTrainee ? 'bg-teal-400' : 'bg-indigo-400'}`}
+                                style={{ 
+                                    height: `${Math.random() * 80 + 20}%`,
+                                    animationDelay: `${i * 0.1}s`,
+                                    animationDuration: `${0.4 + Math.random() * 0.4}s`
+                                }}
+                            ></div>
+                        ))}
                     </div>
                 )}
              </div>
         </div>
 
         <div>
-            <h2 className="text-2xl font-bold text-white mb-2">
-                {isTrainee ? 'Practice Session' : 'Anonymous Voice Lounge'}
+            <h2 className={`text-2xl font-black mb-2 transition-colors ${isConnected ? 'text-white' : 'text-slate-500'}`}>
+                {isTrainee ? 'Practice Lounge' : 'CollegeGate Voice AI'}
             </h2>
-            <p className="text-slate-400 max-w-xs mx-auto">
+            <p className="text-slate-500 text-sm max-w-xs mx-auto leading-relaxed">
                 {isConnected 
                     ? isTalking 
-                        ? (isTrainee ? "AI Student is asking..." : "Counselor is speaking...") 
-                        : "Listening... (Speak or Upload Doc)" 
-                    : (isTrainee ? "Start a mock session with an AI student to practice your skills." : "Connect privately with our AI Counselor regarding colleges, fees, or exams.")}
+                        ? (isTrainee ? "Trainee is speaking..." : "Our AI Guide is explaining...") 
+                        : "Listening... Try asking about a skill roadmap or a college campus visualization." 
+                    : "Connect privately for career and admission advice."}
             </p>
-            {error && <p className="text-red-400 mt-2 text-sm bg-red-900/20 p-2 rounded-lg border border-red-500/20">{error}</p>}
+            {error && <p className="text-red-400 mt-4 text-xs font-bold uppercase tracking-widest">{error}</p>}
         </div>
 
-        <div className="flex flex-col gap-4 w-full">
+        <div className="flex flex-col gap-4 w-full max-w-xs">
             <button
                 onClick={isConnected ? disconnect : connectToLiveAPI}
-                className={`w-full px-8 py-4 rounded-full font-semibold text-lg transition-all transform hover:scale-105 shadow-xl ${
+                className={`w-full px-8 py-5 rounded-3xl font-black text-lg transition-all transform active:scale-95 shadow-2xl ${
                     isConnected 
-                    ? 'bg-red-500 hover:bg-red-600 text-white' 
-                    : (isTrainee ? 'bg-teal-600 hover:bg-teal-500 text-white' : 'bg-indigo-600 hover:bg-indigo-500 text-white')
+                    ? 'bg-rose-600 hover:bg-rose-700 text-white shadow-rose-900/20' 
+                    : (isTrainee ? 'bg-teal-500 hover:bg-teal-400 text-slate-950 shadow-teal-500/20' : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-500/20')
                 }`}
             >
-                {isConnected ? 'End Call' : (isTrainee ? 'Start Practice Session' : 'Start Anonymous Call')}
+                {isConnected ? 'End Consultation' : (isTrainee ? 'Enter Simulator' : 'Call AI Counselor')}
             </button>
             
-            {/* Document Upload Button - Only visible when connected */}
-            <div className={`transition-all duration-300 ${isConnected ? 'opacity-100 max-h-20' : 'opacity-0 max-h-0 overflow-hidden'}`}>
-                <input 
-                    type="file" 
-                    ref={fileInputRef} 
-                    onChange={handleFileUpload} 
-                    className="hidden" 
-                    accept="image/png, image/jpeg, image/jpg"
-                />
-                <button 
-                    onClick={() => fileInputRef.current?.click()}
-                    className="w-full px-6 py-3 rounded-xl font-medium text-indigo-200 bg-white/10 hover:bg-white/20 border border-white/10 transition-colors flex items-center justify-center gap-2"
-                >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                    Show Document / Resume
-                </button>
-                <p className="text-[10px] text-slate-500 mt-2">Upload a document for context.</p>
-            </div>
+            {isConnected && (
+                <div className="animate-fade-in">
+                    <input type="file" ref={fileInputRef} onChange={handleFileUpload} className="hidden" accept="image/*" />
+                    <button 
+                        onClick={() => fileInputRef.current?.click()}
+                        className={`w-full px-6 py-4 rounded-2xl font-bold transition-all border ${isTrainee ? 'bg-teal-500/5 border-teal-500/20 text-teal-400' : 'bg-white/5 border-white/10 text-indigo-300'}`}
+                    >
+                        Scan Transcript / Document
+                    </button>
+                </div>
+            )}
         </div>
 
-        <p className="text-xs text-slate-500 mt-4">
-            Identity protected. Voice processed via Gemini Safe Link.
+        <p className="text-[10px] font-bold text-slate-600 uppercase tracking-[0.2em] mt-auto">
+            Secure • Anonymous • AI-Powered
         </p>
-
       </div>
+
+      {/* Generated Images Sidebar */}
+      {generatedImages.length > 0 && (
+          <div className="w-full md:w-1/3 z-10 bg-black/30 backdrop-blur-xl border-t md:border-t-0 md:border-l border-white/5 p-6 overflow-y-auto animate-slide-left">
+              <div className="flex items-center gap-2 mb-6 border-b border-white/5 pb-4">
+                  <span className="text-indigo-400 text-xl">🖼️</span>
+                  <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest">Visualizations</h3>
+              </div>
+              <div className="space-y-6">
+                  {generatedImages.map((img, idx) => (
+                      <div key={idx} className="group relative rounded-2xl overflow-hidden border border-white/10 shadow-2xl animate-fade-in">
+                          <img src={img} alt={`Campus ${idx}`} className="w-full aspect-video object-cover transition-transform duration-700 group-hover:scale-110" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <a href={img} download={`collegegate-vis-${idx}.png`} className="text-[10px] font-bold text-white uppercase tracking-widest bg-indigo-600 px-3 py-1 rounded-full shadow-lg">Download HD</a>
+                          </div>
+                      </div>
+                  ))}
+              </div>
+          </div>
+      )}
+
     </div>
   );
 };

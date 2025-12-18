@@ -94,16 +94,16 @@ export const generateCampusVideo = async (
         });
     }
 
-    // Polling loop
+    // Polling loop with 10s interval as recommended in guidelines
     while (!operation.done) {
-        await new Promise(resolve => setTimeout(resolve, 5000)); // 5s poll
+        await new Promise(resolve => setTimeout(resolve, 10000));
         operation = await ai.operations.getVideosOperation({operation: operation});
     }
 
-    const videoUri = operation.response?.generatedVideos?.[0]?.video?.uri;
-    if (videoUri) {
+    const downloadLink = operation.response?.generatedVideos?.[0]?.video?.uri;
+    if (downloadLink) {
         // Fetch the actual video bytes using the key
-        const videoResponse = await fetch(`${videoUri}&key=${process.env.API_KEY}`);
+        const videoResponse = await fetch(`${downloadLink}&key=${process.env.API_KEY}`);
         const blob = await videoResponse.blob();
         return URL.createObjectURL(blob);
     }
@@ -123,8 +123,9 @@ export interface SearchResult {
 export const searchCollegeInfo = async (query: string): Promise<SearchResult> => {
     try {
         const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+        // Use gemini-3-flash-preview for Search Grounding tasks
         const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
+            model: 'gemini-3-flash-preview',
             contents: query,
             config: {
                 tools: [{ googleSearch: {} }],
