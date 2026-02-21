@@ -85,7 +85,11 @@ export interface Inquiry {
   id: string;
   studentName: string;
   studentId: string;
+  email: string;
+  mobile: string;
+  whatsapp?: string;
   course: string;
+  mode: CourseMode;
   query: string;
   timestamp: string;
   status: 'PENDING' | 'ANSWERED';

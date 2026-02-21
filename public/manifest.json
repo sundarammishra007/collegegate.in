@@ -1,0 +1,21 @@
+{
+  "name": "CollegeGate",
+  "short_name": "CollegeGate",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4f46e5",
+  "description": "Your Gateway to Top Universities and Courses",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/8074/8074808.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/8074/8074808.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
