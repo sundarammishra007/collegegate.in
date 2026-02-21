@@ -1,4 +1,386 @@
-import { College } from './types';
+import { College, Course, University } from './types';
+
+export const COURSES_DATA: Course[] = [
+  // --- Diploma Programs ---
+  {
+    id: 'd1',
+    name: 'Diploma in Computer Science Engineering',
+    type: 'Diploma',
+    modes: ['Regular', 'Distance'],
+    image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&q=80&w=1000',
+    description: 'Foundation in computing, programming, and system design.'
+  },
+  {
+    id: 'd2',
+    name: 'Diploma in Mechanical Engineering',
+    type: 'Diploma',
+    modes: ['Regular', 'Distance'],
+    image: 'https://images.unsplash.com/photo-1537462715879-360eeb61a0ad?auto=format&fit=crop&q=80&w=1000',
+    description: 'Study of mechanics, thermodynamics, and structural analysis.'
+  },
+  {
+    id: 'd3',
+    name: 'Diploma in Civil Engineering',
+    type: 'Diploma',
+    modes: ['Regular', 'Distance'],
+    image: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&q=80&w=1000',
+    description: 'Construction, design, and maintenance of physical environments.'
+  },
+  {
+    id: 'd4',
+    name: 'Diploma in Electronics & Communication',
+    type: 'Diploma',
+    modes: ['Regular', 'Distance'],
+    image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=1000',
+    description: 'Electronic circuits, communication systems, and signal processing.'
+  },
+  {
+    id: 'd5',
+    name: 'Diploma in Electrical Engineering',
+    type: 'Diploma',
+    modes: ['Regular', 'Distance'],
+    image: 'https://images.unsplash.com/photo-1498084393753-b411b2d26b34?auto=format&fit=crop&q=80&w=1000',
+    description: 'Study of electricity, electronics, and electromagnetism.'
+  },
+  {
+    id: 'd6',
+    name: 'Diploma in Pharmacy',
+    type: 'Diploma',
+    modes: ['Regular'],
+    image: 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?auto=format&fit=crop&q=80&w=1000',
+    description: 'Fundamentals of pharmaceutical sciences and drug dispensing.'
+  },
+  {
+    id: 'd7',
+    name: 'Diploma in Marine Engineering',
+    type: 'Diploma',
+    modes: ['Regular'],
+    image: 'https://images.unsplash.com/photo-1505672675380-412294c87e93?auto=format&fit=crop&q=80&w=1000',
+    description: 'Operation and maintenance of ship machinery.'
+  },
+  {
+    id: 'd8',
+    name: 'D.El.Ed (Diploma in Elementary Education)',
+    type: 'Diploma',
+    modes: ['Regular', 'Distance'],
+    image: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&q=80&w=1000',
+    description: 'Training for primary school teaching.'
+  },
+
+  // --- Undergraduate (UG) ---
+  {
+    id: 'u1',
+    name: 'BA - Bachelor of Arts',
+    type: 'UG',
+    modes: ['Regular', 'Online', 'Distance'],
+    image: 'https://images.unsplash.com/photo-1457369804613-52c61a468e7d?auto=format&fit=crop&q=80&w=1000',
+    description: 'Humanities, social sciences, and liberal arts.'
+  },
+  {
+    id: 'u2',
+    name: 'B.Com - Bachelor of Commerce',
+    type: 'UG',
+    modes: ['Regular', 'Online', 'Distance'],
+    image: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&q=80&w=1000',
+    description: 'Commerce, accounting, finance, and business law.'
+  },
+  {
+    id: 'u3',
+    name: 'BA LL.B',
+    type: 'UG',
+    modes: ['Regular'],
+    image: 'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&q=80&w=1000',
+    description: 'Integrated arts and law degree.'
+  },
+  {
+    id: 'u4',
+    name: 'B.Sc Nursing',
+    type: 'UG',
+    modes: ['Regular'],
+    image: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&q=80&w=1000',
+    description: 'Professional nursing and healthcare.'
+  },
+  {
+    id: 'u5',
+    name: 'B.Sc Agriculture',
+    type: 'UG',
+    modes: ['Regular', 'Distance'],
+    image: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?auto=format&fit=crop&q=80&w=1000',
+    description: 'Agricultural science and modern farming techniques.'
+  },
+  {
+    id: 'u6',
+    name: 'B.Sc Biotechnology',
+    type: 'UG',
+    modes: ['Regular'],
+    image: 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&q=80&w=1000',
+    description: 'Biological systems and technology application.'
+  },
+  {
+    id: 'u7',
+    name: 'B.Sc Forensic Science',
+    type: 'UG',
+    modes: ['Regular'],
+    image: 'https://images.unsplash.com/photo-1579154204601-01588f351e67?auto=format&fit=crop&q=80&w=1000',
+    description: 'Application of science to criminal and civil laws.'
+  },
+  {
+    id: 'u8',
+    name: 'BCA - Bachelor of Computer Application',
+    type: 'UG',
+    modes: ['Regular', 'Online', 'Distance'],
+    image: 'https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&q=80&w=1000',
+    description: 'Software development and computer applications.'
+  },
+  {
+    id: 'u9',
+    name: 'BBA - Bachelor of Business Administration',
+    type: 'UG',
+    modes: ['Regular', 'Online', 'Distance'],
+    image: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&q=80&w=1000',
+    description: 'Business management and administration principles.'
+  },
+  {
+    id: 'u10',
+    name: 'BFA (Bachelor of Fine Arts) in Fashion Designing',
+    type: 'UG',
+    modes: ['Regular'],
+    image: 'https://images.unsplash.com/photo-1558769132-cb1aea458c5e?auto=format&fit=crop&q=80&w=1000',
+    description: 'Visual arts and fashion design.'
+  },
+  {
+    id: 'u11',
+    name: 'B.Tech - Bachelor of Technology',
+    type: 'UG',
+    modes: ['Regular'],
+    image: 'https://images.unsplash.com/photo-1581092921461-eab62e97a782?auto=format&fit=crop&q=80&w=1000',
+    description: 'Engineering and technology disciplines.'
+  },
+  {
+    id: 'u12',
+    name: 'BPT - Bachelor of Physiotherapy',
+    type: 'UG',
+    modes: ['Regular'],
+    image: 'https://images.unsplash.com/photo-1576091160550-217358c7e618?auto=format&fit=crop&q=80&w=1000',
+    description: 'Physical therapy and rehabilitation.'
+  },
+  {
+    id: 'u13',
+    name: 'B.Pharma - Bachelor of Pharmacy',
+    type: 'UG',
+    modes: ['Regular'],
+    image: 'https://images.unsplash.com/photo-1631549916768-4119b2e5f926?auto=format&fit=crop&q=80&w=1000',
+    description: 'Pharmaceutical sciences and medicine.'
+  },
+  {
+    id: 'u14',
+    name: 'B.Ed (Bachelor of Education)',
+    type: 'UG',
+    modes: ['Regular', 'Distance'],
+    image: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&q=80&w=1000',
+    description: 'Professional degree for teaching.'
+  },
+  {
+    id: 'u15',
+    name: 'B.Lib (Bachelor of Library Science)',
+    type: 'UG',
+    modes: ['Regular', 'Distance'],
+    image: 'https://images.unsplash.com/photo-1507842217121-9e962835d75d?auto=format&fit=crop&q=80&w=1000',
+    description: 'Library and information science.'
+  },
+  {
+    id: 'u16',
+    name: 'LLB',
+    type: 'UG',
+    modes: ['Regular'],
+    image: 'https://images.unsplash.com/photo-1589391886645-d51941baf7fb?auto=format&fit=crop&q=80&w=1000',
+    description: 'Law and legal studies.'
+  },
+  {
+    id: 'u17',
+    name: 'BJMC (Bachelor of Journalism & Mass Communication)',
+    type: 'UG',
+    modes: ['Regular', 'Online', 'Distance'],
+    image: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&q=80&w=1000',
+    description: 'Journalism, media, and communication.'
+  },
+  {
+    id: 'u18',
+    name: 'BHM / BHMCT',
+    type: 'UG',
+    modes: ['Regular'],
+    image: 'https://images.unsplash.com/photo-1517840901100-8179e982acb7?auto=format&fit=crop&q=80&w=1000',
+    description: 'Hotel management and catering technology.'
+  },
+
+  // --- Postgraduate (PG) ---
+  {
+    id: 'p1',
+    name: 'Master of Commerce',
+    type: 'PG',
+    modes: ['Regular', 'Online', 'Distance'],
+    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=1000',
+    description: 'Advanced commerce and business studies.'
+  },
+  {
+    id: 'p2',
+    name: 'MA (Master of Arts)',
+    type: 'PG',
+    modes: ['Regular', 'Online', 'Distance'],
+    image: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&q=80&w=1000',
+    description: 'Advanced studies in arts and humanities.'
+  },
+  {
+    id: 'p3',
+    name: 'MCA - Master of Computer Applications',
+    type: 'PG',
+    modes: ['Regular', 'Online', 'Distance'],
+    image: 'https://images.unsplash.com/photo-1555099962-4199c345e5dd?auto=format&fit=crop&q=80&w=1000',
+    description: 'Advanced computer applications and software.'
+  },
+  {
+    id: 'p4',
+    name: 'MBA (Master of Business Administration)',
+    type: 'PG',
+    modes: ['Regular', 'Online', 'Distance'],
+    image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&q=80&w=1000',
+    description: 'Business administration and management.'
+  },
+  {
+    id: 'p5',
+    name: 'M.Tech (Master of Technology)',
+    type: 'PG',
+    modes: ['Regular'],
+    image: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&q=80&w=1000',
+    description: 'Advanced technology and engineering.'
+  },
+  {
+    id: 'p6',
+    name: 'M.Lib (Master of Library Science)',
+    type: 'PG',
+    modes: ['Regular', 'Distance'],
+    image: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&q=80&w=1000',
+    description: 'Advanced library science.'
+  },
+  {
+    id: 'p7',
+    name: 'LL.M - Master of Laws',
+    type: 'PG',
+    modes: ['Regular'],
+    image: 'https://images.unsplash.com/photo-1505664194779-8beaceb93744?auto=format&fit=crop&q=80&w=1000',
+    description: 'Advanced legal studies.'
+  },
+  {
+    id: 'p8',
+    name: 'GNM - General Nursing and Midwifery',
+    type: 'Diploma', // GNM is typically a diploma, though listed under PG in the prompt list, I'll classify as Diploma/PG based on context, but usually it's a diploma. Let's stick to the prompt's grouping or just put it in Diploma? The prompt had it at the end. I'll put it in Diploma for accuracy or PG if strictly following the list order. Let's put it in Diploma as it's a Diploma course.
+    modes: ['Regular'],
+    image: 'https://images.unsplash.com/photo-1584515933487-9bdbb7d43153?auto=format&fit=crop&q=80&w=1000',
+    description: 'Nursing and midwifery.'
+  }
+];
+
+export const UNIVERSITIES_DATA: University[] = [
+    {
+        id: 'jnu',
+        name: 'Jaipur National University',
+        location: 'Jaipur, Rajasthan',
+        modes: ['Regular', 'Online', 'Distance'],
+        image: 'https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&q=80&w=1000',
+        tags: ['UGC Approved', 'NAAC Accredited'],
+        websiteUrl: 'https://admissioncell.online/university/jnu-regular.php'
+    },
+    {
+        id: 'mangalayatan',
+        name: 'Mangalayatan University',
+        location: 'Aligarh, UP',
+        modes: ['Regular', 'Online', 'Distance'],
+        image: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=1000',
+        tags: ['UGC Approved', 'NAAC A+'],
+        websiteUrl: 'https://admissioncell.online/university/mangalayatan-regular.php'
+    },
+    {
+        id: 'vgu',
+        name: 'Vivekananda Global University (VGU)',
+        location: 'Jaipur, Rajasthan',
+        modes: ['Regular', 'Online', 'Distance'],
+        image: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?auto=format&fit=crop&q=80&w=1000',
+        tags: ['NAAC A+', 'ICAR Approved'],
+        websiteUrl: 'https://admissioncell.online/university/vgu-regular.php'
+    },
+    {
+        id: 'usha_martin',
+        name: 'Usha Martin University',
+        location: 'Ranchi, Jharkhand',
+        modes: ['Regular'],
+        image: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&q=80&w=1000',
+        tags: ['UGC Approved', 'AIU Member'],
+        websiteUrl: 'https://admissioncell.online/university/usha-marting.php'
+    },
+    {
+        id: 'subharti',
+        name: 'Subharti University',
+        location: 'Meerut, UP',
+        modes: ['Regular', 'Online'],
+        image: 'https://images.unsplash.com/photo-1592280771884-131185386d28?auto=format&fit=crop&q=80&w=1000',
+        tags: ['NAAC A', 'Distance Education'],
+        websiteUrl: 'https://admissioncell.online/university/subharti.php'
+    },
+    {
+        id: 'srm',
+        name: 'SRM University',
+        location: 'Chennai, Tamil Nadu',
+        modes: ['Regular'],
+        image: 'https://images.unsplash.com/photo-1564981797816-1043664bf78d?auto=format&fit=crop&q=80&w=1000',
+        tags: ['NAAC A++', 'Top Ranked'],
+        websiteUrl: 'https://admissioncell.online/university/srm-university.php'
+    },
+    {
+        id: 'sandeep',
+        name: 'Sandeep University',
+        location: 'Nashik, Maharashtra',
+        modes: ['Regular'],
+        image: 'https://images.unsplash.com/photo-1590012314607-6da99985857e?auto=format&fit=crop&q=80&w=1000',
+        tags: ['UGC Recognized'],
+        websiteUrl: 'https://admissioncell.online/university/sandeep-university.php'
+    },
+    {
+        id: 'sage',
+        name: 'SAGE University',
+        location: 'Indore/Bhopal',
+        modes: ['Regular'],
+        image: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&q=80&w=1000',
+        tags: ['Top Private University'],
+        websiteUrl: 'https://admissioncell.online/university/sage-university.php'
+    },
+    {
+        id: 'marwadi',
+        name: 'Marwadi University',
+        location: 'Rajkot, Gujarat',
+        modes: ['Regular'],
+        image: 'https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&q=80&w=1000',
+        tags: ['NAAC A+', 'GTU Affiliated'],
+        websiteUrl: 'https://admissioncell.online/university/marwadi-university.php'
+    },
+    {
+        id: 'mangalmay',
+        name: 'Mangalmay University',
+        location: 'Greater Noida, UP',
+        modes: ['Regular'],
+        image: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&q=80&w=1000',
+        tags: ['NBA Accredited'],
+        websiteUrl: 'https://admissioncell.online/university/mangalmay-university.php'
+    },
+    {
+        id: 'arka_jain',
+        name: 'Arka Jain University',
+        location: 'Jamshedpur, Jharkhand',
+        modes: ['Regular'],
+        image: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=1000',
+        tags: ['First Private University in Region'],
+        websiteUrl: 'https://admissioncell.online/university/arka-jain.php'
+    }
+];
 
 export const MOCK_COLLEGES: College[] = [
   // --- Engineering & Tech ---

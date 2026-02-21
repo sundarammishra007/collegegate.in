@@ -17,6 +17,10 @@ const SKILLS_LIST: Skill[] = [
     { id: 'wd', title: 'Full-Stack Web', icon: '💻', color: 'bg-orange-500', description: 'Build modern web applications.', difficulty: 'Beginner' },
     { id: 'cs', title: 'Cyber Security', icon: '🔐', color: 'bg-red-500', description: 'Protect systems from digital attacks.', difficulty: 'Intermediate' },
     { id: 'dm', title: 'Digital Marketing', icon: '📈', color: 'bg-pink-500', description: 'Master SEO, SEM, and social growth.', difficulty: 'Beginner' },
+    { id: 'cc', title: 'Cloud Computing', icon: '☁️', color: 'bg-sky-500', description: 'AWS, Azure, and Google Cloud mastery.', difficulty: 'Intermediate' },
+    { id: 'bc', title: 'Blockchain', icon: '🔗', color: 'bg-indigo-500', description: 'Decentralized apps and smart contracts.', difficulty: 'Advanced' },
+    { id: 'ui', title: 'UI/UX Design', icon: '🎨', color: 'bg-purple-500', description: 'Design intuitive digital experiences.', difficulty: 'Beginner' },
+    { id: 'md', title: 'Mobile App Dev', icon: '📱', color: 'bg-teal-500', description: 'iOS and Android app development.', difficulty: 'Intermediate' },
 ];
 
 const SkillsSection: React.FC = () => {
@@ -51,7 +55,7 @@ const SkillsSection: React.FC = () => {
     };
 
     return (
-        <div className="max-w-7xl mx-auto p-4 md:p-8">
+        <div className="max-w-7xl mx-auto p-4 md:p-8 pb-24">
             <div className="mb-12 text-center">
                 <h1 className="text-4xl font-extrabold text-slate-900 mb-4">Master New Skills</h1>
                 <p className="text-slate-500 text-lg max-w-2xl mx-auto">
@@ -59,7 +63,7 @@ const SkillsSection: React.FC = () => {
                 </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
                 {SKILLS_LIST.map((skill) => (
                     <div 
                         key={skill.id}
@@ -77,6 +81,16 @@ const SkillsSection: React.FC = () => {
                         </div>
                     </div>
                 ))}
+            </div>
+
+            <div className="bg-gradient-to-r from-indigo-600 to-violet-600 rounded-3xl p-8 md:p-12 text-center text-white shadow-xl">
+                <h2 className="text-3xl font-bold mb-4">Need Personalized Career Guidance?</h2>
+                <p className="text-indigo-100 text-lg mb-8 max-w-2xl mx-auto">
+                    Our expert counselors can help you choose the right path, whether it's a degree or a skill-based career.
+                </p>
+                <button className="bg-white text-indigo-600 px-8 py-3 rounded-full font-bold text-lg hover:bg-indigo-50 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                    Contact CollegeGate Counselors
+                </button>
             </div>
 
             {/* Modal/Overlay for Roadmap */}

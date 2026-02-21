@@ -1,3 +1,24 @@
+export type CourseMode = 'Regular' | 'Online' | 'Distance';
+
+export interface Course {
+  id: string;
+  name: string;
+  type: 'Diploma' | 'UG' | 'PG';
+  modes: CourseMode[];
+  image: string;
+  description?: string;
+}
+
+export interface University {
+  id: string;
+  name: string;
+  location: string;
+  modes: CourseMode[];
+  image: string;
+  tags: string[];
+  websiteUrl?: string;
+}
+
 export interface College {
   id: string;
   name: string;
@@ -29,6 +50,7 @@ export enum NavView {
   COMPARE = 'COMPARE',
   INQUIRY = 'INQUIRY',
   DETAIL = 'DETAIL',
+  UNIVERSITY_DETAIL = 'UNIVERSITY_DETAIL',
   AUTH = 'AUTH',
   ADMIN_DASHBOARD = 'ADMIN_DASHBOARD',
   COUNSELOR_DASHBOARD = 'COUNSELOR_DASHBOARD'
@@ -41,7 +63,7 @@ export interface Message {
   timestamp: Date;
 }
 
-export type UserRole = 'STUDENT' | 'COUNSELOR' | 'ADMIN' | 'TRAINEE';
+export type UserRole = 'STUDENT' | 'COUNSELOR' | 'ADMIN' | 'TRAINEE' | 'COLLEGE_PARTNER' | 'ASSOCIATE_PARTNER';
 
 export interface User {
   id: string;
@@ -54,6 +76,9 @@ export interface User {
   studentId?: string;
   timestamp: string;
   banned?: boolean;
+  academicAchievements?: string;
+  interests?: string[];
+  preferredStudyModes?: CourseMode[];
 }
 
 export interface Inquiry {
