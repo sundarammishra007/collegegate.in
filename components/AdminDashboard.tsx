@@ -13,7 +13,7 @@ interface AdminDashboardProps {
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ colleges, setColleges, courses, setCourses, inquiries }) => {
   const [activeSection, setActiveSection] = useState<'DASHBOARD' | 'USERS' | 'COLLEGES' | 'COURSES' | 'INQUIRIES'>('DASHBOARD');
   const [users, setUsers] = useState<User[]>([]);
-  const [universities, setUniversities] = useState(UNIVERSITIES_DATA); // Local state for universities as they are in constants currently
+  const [universities, setUniversities] = useState(UNIVERSITIES_DATA); 
 
   useEffect(() => {
     const storedUsers = localStorage.getItem('collegegate_users');
@@ -58,7 +58,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ colleges, setColleges, 
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
           <div className="p-6 border-b border-slate-100 flex justify-between items-center">
               <h3 className="font-bold text-lg text-slate-800">User Management</h3>
-              <button className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-indigo-700">Add User</button>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse min-w-[800px]">
@@ -68,6 +67,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ colleges, setColleges, 
                         <th className="p-4 font-semibold border-b">Name</th>
                         <th className="p-4 font-semibold border-b">Email</th>
                         <th className="p-4 font-semibold border-b">Mobile</th>
+                        <th className="p-4 font-semibold border-b">Password</th>
                         <th className="p-4 font-semibold border-b">Status</th>
                         <th className="p-4 font-semibold border-b text-right">Actions</th>
                     </tr>
@@ -89,6 +89,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ colleges, setColleges, 
                             <td className="p-4 font-medium text-slate-800">{user.name}</td>
                             <td className="p-4 text-slate-600 font-mono text-xs">{user.email}</td>
                             <td className="p-4 text-slate-600 text-xs font-mono">{user.mobile || '-'}</td>
+                            <td className="p-4 text-slate-400 text-xs font-mono">•••••••</td>
                             <td className="p-4">
                                 {user.banned ? (
                                     <span className="inline-flex items-center gap-1 text-red-600 bg-red-100 px-2 py-1 rounded text-xs font-bold">Banned</span>
@@ -176,6 +177,47 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ colleges, setColleges, 
       </div>
   );
 
+  const renderInquiries = () => (
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+          <div className="p-6 border-b border-slate-100">
+              <h3 className="font-bold text-lg text-slate-800">All Inquiries</h3>
+          </div>
+          <div className="divide-y divide-slate-100">
+              {inquiries.length > 0 ? (
+                  inquiries.map((inquiry) => (
+                      <div key={inquiry.id} className="p-6 hover:bg-slate-50 transition-colors">
+                          <div className="flex justify-between items-start mb-2">
+                              <div>
+                                  <h4 className="font-bold text-slate-800">{inquiry.studentName}</h4>
+                                  <p className="text-xs text-slate-500">{inquiry.email} • {inquiry.mobile}</p>
+                              </div>
+                              <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase ${
+                                  inquiry.status === 'ANSWERED' ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600'
+                              }`}>
+                                  {inquiry.status}
+                              </span>
+                          </div>
+                          <div className="mb-2">
+                              <span className="text-xs font-bold text-slate-500 uppercase mr-2">Course:</span>
+                              <span className="text-sm font-medium text-slate-700">{inquiry.course} ({inquiry.mode})</span>
+                          </div>
+                          <p className="text-sm text-slate-600 bg-slate-50 p-3 rounded-lg border border-slate-100">
+                              {inquiry.query}
+                          </p>
+                          <div className="mt-2 text-xs text-slate-400">
+                              Received: {new Date(inquiry.timestamp).toLocaleDateString()}
+                          </div>
+                      </div>
+                  ))
+              ) : (
+                  <div className="p-12 text-center text-slate-400">
+                      No inquiries found.
+                  </div>
+              )}
+          </div>
+      </div>
+  );
+
   return (
     <div className="flex min-h-screen bg-slate-50">
         {/* Sidebar */}
@@ -222,11 +264,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ colleges, setColleges, 
             {activeSection === 'USERS' && renderUsers()}
             {activeSection === 'COLLEGES' && renderUniversities()}
             {activeSection === 'COURSES' && renderCourses()}
-            {activeSection === 'INQUIRIES' && (
-                <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8 text-center text-slate-500">
-                    No inquiries found.
-                </div>
-            )}
+            {activeSection === 'INQUIRIES' && renderInquiries()}
         </div>
     </div>
   );

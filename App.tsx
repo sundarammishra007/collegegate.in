@@ -11,6 +11,7 @@ import UniversityDetailView from './components/UniversityDetailView';
 import SignIn from './components/SignIn';
 import AdminDashboard from './components/AdminDashboard';
 import CounselorDashboard from './components/CounselorDashboard';
+import CollegePartnerDashboard from './components/CollegePartnerDashboard';
 import SkillsSection from './components/SkillsSection';
 import Logo from './components/Logo';
 import About from './components/About';
@@ -78,6 +79,7 @@ function AppContent() {
     setUser(loggedInUser);
     if (loggedInUser.role === 'ADMIN') navigate('/admin');
     else if (loggedInUser.role === 'COUNSELOR') navigate('/counselor');
+    else if (loggedInUser.role === 'COLLEGE_PARTNER') navigate('/partner');
     else navigate('/');
   };
 
@@ -152,6 +154,7 @@ function AppContent() {
         <Route path="/login" element={<SignIn onLogin={handleLogin} onCancel={() => navigate('/')} />} />
         <Route path="/admin" element={<AdminDashboard colleges={colleges} setColleges={setColleges} courses={courses} setCourses={setCourses} inquiries={inquiries} />} />
         <Route path="/counselor" element={<CounselorDashboard counselor={user!} inquiries={inquiries} />} />
+        <Route path="/partner" element={<CollegePartnerDashboard partner={user!} colleges={colleges} setColleges={setColleges} inquiries={inquiries} />} />
         <Route path="/skills" element={<SkillsSection />} />
         <Route path="/about" element={<About />} />
         <Route path="/profile" element={<StudentProfile user={user!} onUpdateUser={setUser} onBack={() => navigate('/')} />} />
