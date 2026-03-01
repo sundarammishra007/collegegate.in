@@ -102,7 +102,10 @@ function AppContent() {
           <div className="flex justify-between h-16">
             <div className="flex items-center cursor-pointer" onClick={() => navigate('/')}>
               <Logo />
-              <span className="ml-2 text-xl font-black bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-violet-600 tracking-tight">CollegeGate</span>
+              <span className="ml-2 text-xl font-black tracking-tight">
+                <span style={{ color: '#0F2C4C' }}>College</span>
+                <span style={{ color: '#F97316' }}>Gate</span>
+              </span>
             </div>
             
             <div className="hidden md:flex items-center space-x-1">
