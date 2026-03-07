@@ -287,6 +287,7 @@ export const UNIVERSITIES_DATA: University[] = [
         location: 'Jaipur, Rajasthan',
         modes: ['Regular', 'Online', 'Distance'],
         image: 'https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&q=80&w=1000',
+        logo: 'https://ui-avatars.com/api/?name=Jaipur+National+University&background=random&color=fff&size=128',
         tags: ['UGC Approved', 'NAAC Accredited'],
         websiteUrl: 'https://admissioncell.online/university/jnu-regular.php'
     },
@@ -296,6 +297,7 @@ export const UNIVERSITIES_DATA: University[] = [
         location: 'Aligarh, UP',
         modes: ['Regular', 'Online', 'Distance'],
         image: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=1000',
+        logo: 'https://ui-avatars.com/api/?name=Mangalayatan+University&background=random&color=fff&size=128',
         tags: ['UGC Approved', 'NAAC A+'],
         websiteUrl: 'https://admissioncell.online/university/mangalayatan-regular.php'
     },
@@ -305,6 +307,7 @@ export const UNIVERSITIES_DATA: University[] = [
         location: 'Jaipur, Rajasthan',
         modes: ['Regular', 'Online', 'Distance'],
         image: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?auto=format&fit=crop&q=80&w=1000',
+        logo: 'https://ui-avatars.com/api/?name=Vivekananda+Global+University&background=random&color=fff&size=128',
         tags: ['NAAC A+', 'ICAR Approved'],
         websiteUrl: 'https://admissioncell.online/university/vgu-regular.php'
     },
@@ -314,6 +317,7 @@ export const UNIVERSITIES_DATA: University[] = [
         location: 'Ranchi, Jharkhand',
         modes: ['Regular'],
         image: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&q=80&w=1000',
+        logo: 'https://ui-avatars.com/api/?name=Usha+Martin+University&background=random&color=fff&size=128',
         tags: ['UGC Approved', 'AIU Member'],
         websiteUrl: 'https://admissioncell.online/university/usha-marting.php'
     },
@@ -323,6 +327,7 @@ export const UNIVERSITIES_DATA: University[] = [
         location: 'Meerut, UP',
         modes: ['Regular', 'Online'],
         image: 'https://images.unsplash.com/photo-1592280771884-131185386d28?auto=format&fit=crop&q=80&w=1000',
+        logo: 'https://ui-avatars.com/api/?name=Subharti+University&background=random&color=fff&size=128',
         tags: ['NAAC A', 'Distance Education'],
         websiteUrl: 'https://admissioncell.online/university/subharti.php'
     },
@@ -332,6 +337,7 @@ export const UNIVERSITIES_DATA: University[] = [
         location: 'Chennai, Tamil Nadu',
         modes: ['Regular'],
         image: 'https://images.unsplash.com/photo-1564981797816-1043664bf78d?auto=format&fit=crop&q=80&w=1000',
+        logo: 'https://ui-avatars.com/api/?name=SRM+University&background=random&color=fff&size=128',
         tags: ['NAAC A++', 'Top Ranked'],
         websiteUrl: 'https://admissioncell.online/university/srm-university.php'
     },
@@ -341,6 +347,7 @@ export const UNIVERSITIES_DATA: University[] = [
         location: 'Nashik, Maharashtra',
         modes: ['Regular'],
         image: 'https://images.unsplash.com/photo-1590012314607-6da99985857e?auto=format&fit=crop&q=80&w=1000',
+        logo: 'https://ui-avatars.com/api/?name=Sandeep+University&background=random&color=fff&size=128',
         tags: ['UGC Recognized'],
         websiteUrl: 'https://admissioncell.online/university/sandeep-university.php'
     },
@@ -350,6 +357,7 @@ export const UNIVERSITIES_DATA: University[] = [
         location: 'Indore/Bhopal',
         modes: ['Regular'],
         image: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&q=80&w=1000',
+        logo: 'https://ui-avatars.com/api/?name=SAGE+University&background=random&color=fff&size=128',
         tags: ['Top Private University'],
         websiteUrl: 'https://admissioncell.online/university/sage-university.php'
     },
@@ -359,6 +367,7 @@ export const UNIVERSITIES_DATA: University[] = [
         location: 'Rajkot, Gujarat',
         modes: ['Regular'],
         image: 'https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&q=80&w=1000',
+        logo: 'https://ui-avatars.com/api/?name=Marwadi+University&background=random&color=fff&size=128',
         tags: ['NAAC A+', 'GTU Affiliated'],
         websiteUrl: 'https://admissioncell.online/university/marwadi-university.php'
     },
@@ -368,6 +377,7 @@ export const UNIVERSITIES_DATA: University[] = [
         location: 'Greater Noida, UP',
         modes: ['Regular'],
         image: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&q=80&w=1000',
+        logo: 'https://ui-avatars.com/api/?name=Mangalmay+University&background=random&color=fff&size=128',
         tags: ['NBA Accredited'],
         websiteUrl: 'https://admissioncell.online/university/mangalmay-university.php'
     },
@@ -377,6 +387,7 @@ export const UNIVERSITIES_DATA: University[] = [
         location: 'Jamshedpur, Jharkhand',
         modes: ['Regular'],
         image: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=1000',
+        logo: 'https://ui-avatars.com/api/?name=Arka+Jain+University&background=random&color=fff&size=128',
         tags: ['First Private University in Region'],
         websiteUrl: 'https://admissioncell.online/university/arka-jain.php'
     }

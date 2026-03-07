@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { College, Inquiry, User } from '../types';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { updateInquiry } from '../services/firebase';
 
 interface CollegePartnerDashboardProps {
   partner: User;
@@ -24,6 +25,21 @@ const CollegePartnerDashboard: React.FC<CollegePartnerDashboardProps> = ({ partn
     setColleges(prev => prev.map(c => c.id === myCollege.id ? editForm : c));
     setMyCollege(editForm);
     setIsEditing(false);
+  };
+
+  const handleMarkAnswered = async (inquiryId: string) => {
+    await updateInquiry(inquiryId, { status: 'ANSWERED' });
+  };
+
+  const handleAddNote = async (inquiryId: string, currentNotes: string[] = []) => {
+    const note = prompt("Enter note:");
+    if (note) {
+      await updateInquiry(inquiryId, { notes: [...currentNotes, note] });
+    }
+  };
+
+  const handleViewProfile = (studentName: string) => {
+    alert(`Viewing profile for ${studentName}\n(Feature to be implemented: Navigate to student profile details)`);
   };
 
   const stats = [
@@ -240,8 +256,39 @@ const CollegePartnerDashboard: React.FC<CollegePartnerDashboardProps> = ({ partn
                     <p className="text-sm text-slate-600 bg-slate-50 p-3 rounded-lg border border-slate-100">
                       {inquiry.query}
                     </p>
-                    <div className="mt-2 text-xs text-slate-400">
-                      Received: {new Date(inquiry.timestamp).toLocaleDateString()}
+                    {inquiry.notes && inquiry.notes.length > 0 && (
+                      <div className="mt-2 space-y-1">
+                        {inquiry.notes.map((note, idx) => (
+                          <p key={idx} className="text-xs text-slate-500 italic bg-yellow-50 p-1 rounded border border-yellow-100">Note: {note}</p>
+                        ))}
+                      </div>
+                    )}
+                    <div className="mt-3 flex justify-between items-center">
+                      <div className="text-xs text-slate-400">
+                        Received: {new Date(inquiry.timestamp).toLocaleDateString()}
+                      </div>
+                      <div className="flex gap-2">
+                         {inquiry.status === 'PENDING' && (
+                           <button 
+                             onClick={() => handleMarkAnswered(inquiry.id)}
+                             className="px-3 py-1.5 bg-emerald-100 text-emerald-700 rounded-lg text-xs font-bold hover:bg-emerald-200 transition-colors"
+                           >
+                             Mark Answered
+                           </button>
+                         )}
+                         <button 
+                           onClick={() => handleAddNote(inquiry.id, inquiry.notes)}
+                           className="px-3 py-1.5 bg-indigo-100 text-indigo-700 rounded-lg text-xs font-bold hover:bg-indigo-200 transition-colors"
+                         >
+                           Add Note
+                         </button>
+                         <button 
+                           onClick={() => handleViewProfile(inquiry.studentName)}
+                           className="px-3 py-1.5 bg-slate-100 text-slate-700 rounded-lg text-xs font-bold hover:bg-slate-200 transition-colors"
+                         >
+                           View Profile
+                         </button>
+                      </div>
                     </div>
                   </div>
                 ))

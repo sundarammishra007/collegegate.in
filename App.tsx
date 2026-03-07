@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { HashRouter, Routes, Route, useNavigate, Navigate, useParams } from 'react-router-dom';
 import { NavView, College, User, Inquiry, Course, CourseMode } from './types';
 import { MOCK_COLLEGES, COURSES_DATA, UNIVERSITIES_DATA } from './constants';
+import { auth, db, saveUserToFirestore, getUserProfile, addInquiry, subscribeToInquiries } from './services/firebase';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
 import MagicCampus from './components/MagicCampus';
 import CollegeRegistration from './components/CollegeRegistration';
 import CollegeInquiry from './components/CollegeInquiry';
@@ -57,6 +60,7 @@ const CollegeDetailRoute = ({ colleges, onInquiry, onCompare, isComparing }: any
 function AppContent() {
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
+  const [authLoading, setAuthLoading] = useState(true);
   
   // Data States
   const [colleges, setColleges] = useState<College[]>(MOCK_COLLEGES);
@@ -75,6 +79,41 @@ function AppContent() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [searchTerm, selectedMode]); // Scroll on filter change
 
+  // Firebase Auth Listener
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      if (currentUser) {
+        try {
+          const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+          if (userDoc.exists()) {
+             setUser(userDoc.data() as User);
+          } else {
+             // Handle case where user is in Auth but not in Firestore (shouldn't happen with correct flow)
+             console.warn("User authenticated but profile missing in Firestore");
+             setUser(null); 
+          }
+        } catch (error) {
+          console.error("Error fetching user profile:", error);
+        }
+      } else {
+        setUser(null);
+      }
+      setAuthLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  // Subscribe to inquiries if user is Admin or has CRM access
+  useEffect(() => {
+    if (user && (user.role === 'ADMIN' || user.crmAccess)) {
+      const unsubscribeInquiries = subscribeToInquiries((data) => {
+        setInquiries(data);
+      });
+      return () => unsubscribeInquiries();
+    }
+  }, [user]);
+
   const handleLogin = (loggedInUser: User) => {
     setUser(loggedInUser);
     if (loggedInUser.role === 'ADMIN') navigate('/admin');
@@ -83,9 +122,26 @@ function AppContent() {
     else navigate('/');
   };
 
-  const handleLogout = () => {
-      setUser(null);
-      navigate('/');
+  const handleLogout = async () => {
+      try {
+        await signOut(auth);
+        setUser(null);
+        navigate('/');
+      } catch (error) {
+        console.error("Error signing out:", error);
+      }
+  };
+
+  const handleInquiry = async (inquiry: Inquiry) => {
+    try {
+      await addInquiry(inquiry);
+      // We don't need to manually update state as the subscription will handle it for admins,
+      // and for students/others we might just show a success message.
+      setShowInquiryModal(false);
+    } catch (error) {
+      console.error("Error adding inquiry:", error);
+      alert("Failed to submit inquiry. Please try again.");
+    }
   };
 
   const handleCompare = (collegeId: string) => {
@@ -95,6 +151,14 @@ function AppContent() {
       return [...prev, collegeId];
     });
   };
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
@@ -151,13 +215,13 @@ function AppContent() {
             onAboutClick={() => navigate('/about')}
           />
         } />
-        <Route path="/login" element={<SignIn onLogin={handleLogin} onCancel={() => navigate('/')} />} />
-        <Route path="/admin" element={<AdminDashboard colleges={colleges} setColleges={setColleges} courses={courses} setCourses={setCourses} inquiries={inquiries} />} />
-        <Route path="/counselor" element={<CounselorDashboard counselor={user!} inquiries={inquiries} />} />
-        <Route path="/partner" element={<CollegePartnerDashboard partner={user!} colleges={colleges} setColleges={setColleges} inquiries={inquiries} />} />
+        <Route path="/login" element={user ? <Navigate to="/" /> : <SignIn onLogin={handleLogin} onCancel={() => navigate('/')} />} />
+        <Route path="/admin" element={user ? <AdminDashboard colleges={colleges} setColleges={setColleges} courses={courses} setCourses={setCourses} inquiries={inquiries} /> : <Navigate to="/login" />} />
+        <Route path="/counselor" element={user ? <CounselorDashboard counselor={user} inquiries={inquiries} /> : <Navigate to="/login" />} />
+        <Route path="/partner" element={user ? <CollegePartnerDashboard partner={user} colleges={colleges} setColleges={setColleges} inquiries={inquiries} /> : <Navigate to="/login" />} />
         <Route path="/skills" element={<SkillsSection />} />
         <Route path="/about" element={<About />} />
-        <Route path="/profile" element={<StudentProfile user={user!} onUpdateUser={setUser} onBack={() => navigate('/')} />} />
+        <Route path="/profile" element={user ? <StudentProfile user={user} onUpdateUser={setUser} onBack={() => navigate('/')} /> : <Navigate to="/login" />} />
         <Route path="/university/:id" element={<UniversityDetailRoute onInquiry={() => setShowInquiryModal(true)} />} />
         <Route path="/college/:id" element={<CollegeDetailRoute colleges={colleges} onInquiry={() => setShowInquiryModal(true)} onCompare={handleCompare} isComparing={false} />} />
       </Routes>
@@ -215,7 +279,7 @@ function AppContent() {
                  </button>
               </div>
               <div className="p-0">
-                 <CollegeInquiry collegeName="General Inquiry" onClose={() => setShowInquiryModal(false)} />
+                 <CollegeInquiry collegeName="General Inquiry" onClose={() => setShowInquiryModal(false)} onSubmit={handleInquiry} user={user} />
               </div>
            </div>
         </div>

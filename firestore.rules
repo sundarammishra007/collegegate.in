@@ -1,0 +1,123 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: users
+    // Document ID: User UID
+    // Fields:
+    //   - uid: string (required, immutable) - Firebase Auth UID
+    //   - name: string (required) - Full name
+    //   - email: string (required, email format) - Email address
+    //   - role: string (required, enum) - User role
+    //   - mobile: string (optional) - Mobile number
+    //   - whatsapp: string (optional) - WhatsApp number
+    //   - createdAt: string (optional, timestamp) - Creation time
+    //   - updatedAt: string (optional, timestamp) - Update time
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isDocOwner() {
+      return isAuthenticated() && request.auth.uid == resource.data.uid;
+    }
+
+    function uidUnchanged() {
+      return !('uid' in request.resource.data) || request.resource.data.uid == request.auth.uid;
+    }
+
+    function uidNotModified() {
+      return !('uid' in request.resource.data) || request.resource.data.uid == resource.data.uid;
+    }
+
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    function isValidEmail(email) {
+      return email is string && email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+    }
+
+    function isValidRole(role) {
+      return role in ['STUDENT', 'COUNSELOR', 'ADMIN', 'TRAINEE', 'COLLEGE_PARTNER', 'ASSOCIATE_PARTNER'];
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        (
+          (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+           get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'ADMIN') ||
+          (request.auth.token.email == "sundarammishra007@gmail.com" && request.auth.token.email_verified == true)
+        );
+    }
+
+    // Domain Validators
+
+    function isValidUser(data) {
+      return data.keys().hasAll(['uid', 'name', 'email', 'role']) &&
+             data.uid is string &&
+             data.name is string && data.name.size() > 0 && data.name.size() < 100 &&
+             data.email is string && isValidEmail(data.email) &&
+             data.role is string && isValidRole(data.role) &&
+             (!('mobile' in data) || (data.mobile is string && data.mobile.size() < 20)) &&
+             (!('whatsapp' in data) || (data.whatsapp is string && data.whatsapp.size() < 20)) &&
+             (!('crmAccess' in data) || data.crmAccess is bool);
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /users/{userId} {
+      
+      // Allow read if owner or admin
+      allow read: if isAuthenticated() && (isOwner(userId) || isAdmin());
+
+      // Allow create if authenticated and creating own profile
+      allow create: if isAuthenticated() && 
+                       isOwner(userId) && 
+                       isValidUser(request.resource.data) &&
+                       uidUnchanged() &&
+                       (
+                         (request.resource.data.role == 'STUDENT' && (!('crmAccess' in request.resource.data) || request.resource.data.crmAccess == false)) || 
+                         isAdmin()
+                       );
+
+      // Allow update if owner or admin
+      // Owner cannot change their role, uid, or crmAccess
+      allow update: if isAuthenticated() && 
+                       isValidUser(request.resource.data) &&
+                       uidNotModified() &&
+                       (
+                         (isOwner(userId) && request.resource.data.role == resource.data.role && (!('crmAccess' in request.resource.data) || request.resource.data.crmAccess == resource.data.crmAccess)) || 
+                         isAdmin()
+                       );
+    }
+
+    match /inquiries/{inquiryId} {
+      // Admin and Partners with CRM access can read/write inquiries
+      // Students can create inquiries but only read their own (if we link by ID, but for now open creation)
+      
+      allow read: if isAuthenticated() && (isAdmin() || (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.crmAccess == true));
+      
+      allow create: if isAuthenticated(); // Allow any auth user to submit inquiry
+      
+      allow update: if isAuthenticated() && (isAdmin() || (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.crmAccess == true));
+    }
+  }
+}

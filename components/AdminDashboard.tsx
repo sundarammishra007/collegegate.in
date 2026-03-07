@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { User, College, Course, Inquiry } from '../types';
+import { User, College, Course, Inquiry, UserRole } from '../types';
 import { UNIVERSITIES_DATA } from '../constants';
+import { subscribeToAllUsers, updateUserProfile } from '../services/firebase';
 
 interface AdminDashboardProps {
     colleges: College[];
@@ -14,23 +15,36 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ colleges, setColleges, 
   const [activeSection, setActiveSection] = useState<'DASHBOARD' | 'USERS' | 'COLLEGES' | 'COURSES' | 'INQUIRIES'>('DASHBOARD');
   const [users, setUsers] = useState<User[]>([]);
   const [universities, setUniversities] = useState(UNIVERSITIES_DATA); 
+  const [editingUser, setEditingUser] = useState<string | null>(null);
 
   useEffect(() => {
-    const storedUsers = localStorage.getItem('collegegate_users');
-    if (storedUsers) {
-      setUsers(JSON.parse(storedUsers));
-    }
+    const unsubscribe = subscribeToAllUsers((fetchedUsers) => {
+      setUsers(fetchedUsers);
+    });
+    return () => unsubscribe();
   }, []);
 
-  const toggleBan = (userId: string) => {
-    const updatedUsers = users.map(u => {
-        if (u.id === userId) {
-            return { ...u, banned: !u.banned };
-        }
-        return u;
-    });
-    setUsers(updatedUsers);
-    localStorage.setItem('collegegate_users', JSON.stringify(updatedUsers));
+  const toggleBan = async (userId: string, currentStatus: boolean) => {
+    await updateUserProfile(userId, { banned: !currentStatus });
+  };
+
+  const toggleCrmAccess = async (userId: string, currentAccess: boolean) => {
+    await updateUserProfile(userId, { crmAccess: !currentAccess });
+  };
+
+  const deleteUser = (userId: string) => {
+      if (window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+          // In Firestore, we might want to soft delete or actually delete. 
+          // For now, let's just ban them as "delete" is dangerous without auth cleanup.
+          // Or we can implement deleteUser in firebase service.
+          // Let's just alert for now as delete requires Admin SDK or cloud function for full cleanup.
+          alert("User deletion is restricted. Please ban the user instead.");
+      }
+  };
+
+  const changeUserRole = async (userId: string, newRole: UserRole) => {
+      await updateUserProfile(userId, { role: newRole });
+      setEditingUser(null);
   };
 
   const renderDashboard = () => (
@@ -60,15 +74,15 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ colleges, setColleges, 
               <h3 className="font-bold text-lg text-slate-800">User Management</h3>
           </div>
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse min-w-[800px]">
+            <table className="w-full text-left border-collapse min-w-[900px]">
                 <thead>
                     <tr className="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider">
                         <th className="p-4 font-semibold border-b">Role</th>
                         <th className="p-4 font-semibold border-b">Name</th>
                         <th className="p-4 font-semibold border-b">Email</th>
                         <th className="p-4 font-semibold border-b">Mobile</th>
-                        <th className="p-4 font-semibold border-b">Password</th>
                         <th className="p-4 font-semibold border-b">Status</th>
+                        <th className="p-4 font-semibold border-b">CRM</th>
                         <th className="p-4 font-semibold border-b text-right">Actions</th>
                     </tr>
                 </thead>
@@ -76,20 +90,35 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ colleges, setColleges, 
                     {users.map((user, idx) => (
                         <tr key={idx} className={`hover:bg-slate-50 transition-colors ${user.banned ? 'bg-red-50/50' : ''}`}>
                             <td className="p-4">
-                                <span className={`px-2 py-1 rounded text-xs font-bold ${
-                                    user.role === 'ADMIN' ? 'bg-slate-800 text-white' :
-                                    user.role === 'COUNSELOR' ? 'bg-purple-100 text-purple-700' :
-                                    user.role === 'COLLEGE_PARTNER' ? 'bg-orange-100 text-orange-700' :
-                                    user.role === 'ASSOCIATE_PARTNER' ? 'bg-teal-100 text-teal-700' :
-                                    'bg-indigo-100 text-indigo-700'
-                                }`}>
-                                    {user.role}
-                                </span>
+                                {editingUser === user.id ? (
+                                    <select 
+                                        value={user.role} 
+                                        onChange={(e) => changeUserRole(user.id, e.target.value as UserRole)}
+                                        className="text-xs font-bold p-1 rounded border border-slate-300"
+                                    >
+                                        <option value="STUDENT">STUDENT</option>
+                                        <option value="COUNSELOR">COUNSELOR</option>
+                                        <option value="COLLEGE_PARTNER">COLLEGE PARTNER</option>
+                                        <option value="ASSOCIATE_PARTNER">ASSOCIATE</option>
+                                        <option value="ADMIN">ADMIN</option>
+                                    </select>
+                                ) : (
+                                    <span 
+                                        onClick={() => setEditingUser(user.id)}
+                                        className={`cursor-pointer px-2 py-1 rounded text-xs font-bold ${
+                                        user.role === 'ADMIN' ? 'bg-slate-800 text-white' :
+                                        user.role === 'COUNSELOR' ? 'bg-purple-100 text-purple-700' :
+                                        user.role === 'COLLEGE_PARTNER' ? 'bg-orange-100 text-orange-700' :
+                                        user.role === 'ASSOCIATE_PARTNER' ? 'bg-teal-100 text-teal-700' :
+                                        'bg-indigo-100 text-indigo-700'
+                                    }`}>
+                                        {user.role}
+                                    </span>
+                                )}
                             </td>
                             <td className="p-4 font-medium text-slate-800">{user.name}</td>
                             <td className="p-4 text-slate-600 font-mono text-xs">{user.email}</td>
                             <td className="p-4 text-slate-600 text-xs font-mono">{user.mobile || '-'}</td>
-                            <td className="p-4 text-slate-400 text-xs font-mono">•••••••</td>
                             <td className="p-4">
                                 {user.banned ? (
                                     <span className="inline-flex items-center gap-1 text-red-600 bg-red-100 px-2 py-1 rounded text-xs font-bold">Banned</span>
@@ -97,16 +126,36 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ colleges, setColleges, 
                                     <span className="inline-flex items-center gap-1 text-emerald-600 bg-emerald-100 px-2 py-1 rounded text-xs font-bold">Active</span>
                                 )}
                             </td>
-                            <td className="p-4 text-right">
+                            <td className="p-4">
+                                <label className="relative inline-flex items-center cursor-pointer">
+                                  <input 
+                                    type="checkbox" 
+                                    checked={user.crmAccess || user.role === 'ADMIN'} 
+                                    onChange={() => toggleCrmAccess(user.id, !!user.crmAccess)}
+                                    disabled={user.role === 'ADMIN'}
+                                    className="sr-only peer" 
+                                  />
+                                  <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600"></div>
+                                </label>
+                            </td>
+                            <td className="p-4 text-right flex justify-end gap-2">
                                 {user.role !== 'ADMIN' && (
-                                    <button 
-                                        onClick={() => toggleBan(user.id)}
-                                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                                            user.banned ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'
-                                        }`}
-                                    >
-                                        {user.banned ? 'Unban' : 'Ban'}
-                                    </button>
+                                    <>
+                                        <button 
+                                            onClick={() => toggleBan(user.id, !!user.banned)}
+                                            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                                                user.banned ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
+                                            }`}
+                                        >
+                                            {user.banned ? 'Unban' : 'Ban'}
+                                        </button>
+                                        <button 
+                                            onClick={() => deleteUser(user.id)}
+                                            className="px-3 py-1.5 rounded-lg text-xs font-bold bg-red-100 text-red-700 hover:bg-red-200 transition-all"
+                                        >
+                                            Delete
+                                        </button>
+                                    </>
                                 )}
                             </td>
                         </tr>
@@ -121,15 +170,24 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ colleges, setColleges, 
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
           <div className="p-6 border-b border-slate-100 flex justify-between items-center">
               <h3 className="font-bold text-lg text-slate-800">Universities</h3>
-              <button className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-indigo-700">Add University</button>
+              <button 
+                  onClick={() => alert('Add College functionality to be implemented')}
+                  className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-indigo-700 shadow-md hover:shadow-lg transition-all flex items-center gap-2"
+              >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+                  Add New College
+              </button>
           </div>
           <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
               {universities.map((uni) => (
                   <div key={uni.id} className="flex items-center gap-4 p-4 border border-slate-100 rounded-xl hover:shadow-md transition-all">
                       <img src={uni.image} alt={uni.name} className="w-16 h-16 rounded-lg object-cover" />
                       <div>
-                          <h4 className="font-bold text-slate-800">{uni.name}</h4>
-                          <p className="text-xs text-slate-500">{uni.location}</p>
+                          <div className="flex items-center gap-2">
+                              {uni.logo && <img src={uni.logo} alt="logo" className="w-6 h-6 rounded-full object-contain border border-slate-100" />}
+                              <h4 className="font-bold text-slate-800">{uni.name}</h4>
+                          </div>
+                          <p className="text-xs text-slate-500 mt-0.5">{uni.location}</p>
                           <div className="flex gap-1 mt-1">
                               {uni.modes.map(m => (
                                   <span key={m} className="text-[10px] bg-slate-100 px-1.5 py-0.5 rounded text-slate-600">{m}</span>

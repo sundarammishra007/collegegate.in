@@ -15,6 +15,7 @@ export interface University {
   location: string;
   modes: CourseMode[];
   image: string;
+  logo?: string;
   tags: string[];
   websiteUrl?: string;
 }
@@ -76,6 +77,7 @@ export interface User {
   studentId?: string;
   timestamp: string;
   banned?: boolean;
+  crmAccess?: boolean; // New field for CRM access control
   academicAchievements?: string;
   interests?: string[];
   preferredStudyModes?: CourseMode[];
@@ -93,4 +95,6 @@ export interface Inquiry {
   query: string;
   timestamp: string;
   status: 'PENDING' | 'ANSWERED';
+  notes?: string[]; // New field for CRM notes
+  collegeId?: string; // To link inquiry to specific college
 }
