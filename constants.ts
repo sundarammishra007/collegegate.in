@@ -66,6 +66,14 @@ export const COURSES_DATA: Course[] = [
     image: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&q=80&w=1000',
     description: 'Training for primary school teaching.'
   },
+  {
+    id: 'd9',
+    name: '1 Year Diploma : Hotel, Hospital Operation',
+    type: 'Diploma',
+    modes: ['Regular'],
+    image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&q=80&w=1000',
+    description: 'Diploma in hotel and hospital operations management.'
+  },
 
   // --- Undergraduate (UG) ---
   {
@@ -212,6 +220,38 @@ export const COURSES_DATA: Course[] = [
     image: 'https://images.unsplash.com/photo-1517840901100-8179e982acb7?auto=format&fit=crop&q=80&w=1000',
     description: 'Hotel management and catering technology.'
   },
+  {
+    id: 'u19',
+    name: 'BSc Hotel Management',
+    type: 'UG',
+    modes: ['Regular'],
+    image: 'https://images.unsplash.com/photo-1551882547-ff40c0d5bf8f?auto=format&fit=crop&q=80&w=1000',
+    description: 'Bachelor of Science in Hotel Management.'
+  },
+  {
+    id: 'u20',
+    name: 'Bachelor Degree : Hotel & Hospitality Management',
+    type: 'UG',
+    modes: ['Regular'],
+    image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&q=80&w=1000',
+    description: 'Comprehensive degree in hotel and hospitality management.'
+  },
+  {
+    id: 'u21',
+    name: 'Bachelor in Travel & Tourism Management',
+    type: 'UG',
+    modes: ['Regular'],
+    image: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&q=80&w=1000',
+    description: 'Degree in travel and tourism operations.'
+  },
+  {
+    id: 'u22',
+    name: 'Bachelor Degree : Culinary Arts (Chef)',
+    type: 'UG',
+    modes: ['Regular'],
+    image: 'https://images.unsplash.com/photo-1577219491135-ce391730fb2c?auto=format&fit=crop&q=80&w=1000',
+    description: 'Professional culinary arts and chef training.'
+  },
 
   // --- Postgraduate (PG) ---
   {
@@ -277,10 +317,44 @@ export const COURSES_DATA: Course[] = [
     modes: ['Regular'],
     image: 'https://images.unsplash.com/photo-1584515933487-9bdbb7d43153?auto=format&fit=crop&q=80&w=1000',
     description: 'Nursing and midwifery.'
+  },
+  {
+    id: 'p9',
+    name: 'MBA : Hotel Management , Hospitality Management',
+    type: 'PG',
+    modes: ['Regular'],
+    image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&q=80&w=1000',
+    description: 'Master of Business Administration in Hotel and Hospitality Management.'
+  },
+  {
+    id: 'p10',
+    name: 'Master Degree',
+    type: 'PG',
+    modes: ['Regular'],
+    image: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&q=80&w=1000',
+    description: 'General Master Degree programs.'
+  },
+  {
+    id: 'p11',
+    name: 'MBA : Hospital, Health Care Management',
+    type: 'PG',
+    modes: ['Regular'],
+    image: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=1000',
+    description: 'Master of Business Administration in Hospital and Healthcare Management.'
   }
 ];
 
 export const UNIVERSITIES_DATA: University[] = [
+    {
+        id: 'sbihm-01',
+        name: 'Subhas Bose Institute of Hotel Management (SBIHM Group)',
+        location: 'Kolkata, West Bengal',
+        modes: ['Regular'],
+        image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&q=80&w=1000',
+        logo: 'https://ui-avatars.com/api/?name=SBIHM&background=random&color=fff&size=128',
+        tags: ['AICTE Approved', 'UGC Recognized', 'MAKAUT', 'NCHMCT'],
+        websiteUrl: '#'
+    },
     {
         id: 'jnu',
         name: 'Jaipur National University',
@@ -454,6 +528,21 @@ export const UNIVERSITIES_DATA: University[] = [
 ];
 
 export const MOCK_COLLEGES: College[] = [
+  // --- Hospitality & Management ---
+  {
+    id: 'sbihm-01',
+    name: 'Subhas Bose Institute of Hotel Management (SBIHM Group)',
+    location: 'Kolkata, West Bengal',
+    country: 'India',
+    ranking: 1,
+    fees: 'Contact for Details',
+    exams: ['Direct Admission'],
+    image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&q=80&w=1000',
+    description: 'Subhas Bose Institute of Hotel Management (SBIHM Group), an educational institution approved by AICTE, UGC, MAKAUT & NCHMCT, having its campus and administrative office at Kolkata, West Bengal (hereinafter referred to as the “Institute”).\n\nCourses Offered:\n• BSc Hotel Management\n• Bachelor Degree: Hotel & Hospitality Management\n• MBA: Hotel Management, Hospitality Management\n• Master Degree\n• MBA: Hospital, Health Care Management\n• 1 Year Diploma: Hotel, Hospital Operation\n• Bachelor in Travel & Tourism Management\n• Bachelor Degree: Culinary Arts (Chef)\n• BBA / BCA',
+    tags: ['Hotel Management', 'Hospitality', 'Culinary Arts', 'Healthcare Management', 'BBA', 'BCA'],
+    accreditation: 'AICTE, UGC, MAKAUT & NCHMCT',
+    facilities: ['Training Kitchens', 'Mock Bar', 'Housekeeping Lab', 'Front Office Lab', 'Computer Lab', 'Library']
+  },
   // --- Engineering & Tech ---
   {
     id: '30',

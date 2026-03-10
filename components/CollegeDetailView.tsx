@@ -179,7 +179,7 @@ const CollegeDetailView: React.FC<CollegeDetailViewProps> = ({ college, onBack, 
                   <div className="h-8 w-1 bg-indigo-600 rounded-full"></div>
                   <h2 className="text-2xl font-bold text-slate-800">About the Institute</h2>
               </div>
-              <p className="text-slate-600 leading-relaxed text-lg text-justify md:text-left">
+              <p className="text-slate-600 leading-relaxed text-lg text-justify md:text-left whitespace-pre-line">
                 {college.description}
               </p>
               <div className="mt-6 flex flex-wrap gap-2">
