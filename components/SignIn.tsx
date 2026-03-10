@@ -45,13 +45,15 @@ const SignIn: React.FC<SignInProps> = ({ onLogin, onCancel }) => {
   };
 
   const saveUserToFirestore = async (uid: string, email: string, name: string) => {
+      const isSuperAdmin = email.toLowerCase() === 'sundarammishra007@gmail.com';
+      
       const newUser: User = {
           id: uid,
-          name: name,
+          name: isSuperAdmin ? 'Sundaram Mishra' : name,
           email: email,
-          role: activeTab,
-          mobile: formData.mobile,
-          whatsapp: formData.whatsapp || formData.mobile,
+          role: isSuperAdmin ? 'ADMIN' : activeTab,
+          mobile: isSuperAdmin ? '8271042307' : formData.mobile,
+          whatsapp: isSuperAdmin ? '8271042307' : (formData.whatsapp || formData.mobile),
           timestamp: new Date().toISOString(),
           banned: false
       };
@@ -59,7 +61,7 @@ const SignIn: React.FC<SignInProps> = ({ onLogin, onCancel }) => {
       if (activeTab === 'COLLEGE_PARTNER' || activeTab === 'ASSOCIATE_PARTNER') {
           newUser.specialization = formData.specialization || '';
       }
-      if (activeTab === 'STUDENT') {
+      if (activeTab === 'STUDENT' && !isSuperAdmin) {
           newUser.studentId = `ST-${Math.floor(Math.random() * 10000)}`;
       }
       
@@ -116,9 +118,12 @@ const SignIn: React.FC<SignInProps> = ({ onLogin, onCancel }) => {
         return;
     }
 
-    if (activeTab === 'ADMIN' && formData.password !== 'admin123' && !isLogin) {
-         // Simple check for admin registration, though ideally admin creation should be restricted
-         // For now, we allow login if they have the password, or existing admin logic
+    if (activeTab === 'ADMIN' && !isLogin) {
+        if (formData.email.toLowerCase() !== 'sundarammishra007@gmail.com') {
+            setError("Only the Super Admin can register an Admin account.");
+            setLoading(false);
+            return;
+        }
     }
 
     try {

@@ -62,7 +62,7 @@ service cloud.firestore {
         (
           (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
            get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'ADMIN') ||
-          (request.auth.token.email == "sundarammishra007@gmail.com" && request.auth.token.email_verified == true)
+          (request.auth.token.email == "sundarammishra007@gmail.com")
         );
     }
 
@@ -114,7 +114,7 @@ service cloud.firestore {
                        isValidUser(request.resource.data) &&
                        uidUnchanged() &&
                        (
-                         (request.resource.data.role == 'STUDENT' && (!('crmAccess' in request.resource.data) || request.resource.data.crmAccess == false)) || 
+                         (request.resource.data.role in ['STUDENT', 'COLLEGE_PARTNER', 'ASSOCIATE_PARTNER', 'COUNSELOR'] && (!('crmAccess' in request.resource.data) || request.resource.data.crmAccess == false)) || 
                          isAdmin()
                        );
 
