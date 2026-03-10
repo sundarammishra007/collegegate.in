@@ -163,29 +163,30 @@ function AppContent() {
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 font-sans text-slate-900">
       {/* Navigation Bar */}
-      <nav className="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40">
+      <nav className="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
+          <div className="flex justify-between h-20">
             <div className="flex items-center cursor-pointer" onClick={() => navigate('/')}>
-              <Logo />
-              <span className="ml-2 text-xl font-black tracking-tight">
-                <span style={{ color: '#0F2C4C' }}>College</span>
-                <span style={{ color: '#F97316' }}>Gate</span>
+              <Logo className="w-14 h-14" />
+              <span className="ml-2 text-2xl font-black tracking-tight hidden sm:block">
+                <span style={{ color: '#173054' }}>College</span>
+                <span style={{ color: '#E97D22' }}>Gate</span>
               </span>
             </div>
             
-            <div className="hidden md:flex items-center space-x-1">
-              <button onClick={() => navigate('/')} className="px-4 py-2 rounded-full text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-indigo-600 transition-all">Home</button>
-              <button onClick={() => navigate('/skills')} className="px-4 py-2 rounded-full text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-indigo-600 transition-all">Skills & AI</button>
-              <button onClick={() => navigate('/about')} className="px-4 py-2 rounded-full text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-indigo-600 transition-all">About</button>
+            <div className="hidden md:flex items-center space-x-2">
+              <button onClick={() => navigate('/')} className="px-4 py-2 rounded-full text-[15px] font-bold font-sans text-[#173054] hover:text-[#E97D22] transition-colors">Home</button>
+              <button onClick={() => navigate('/')} className="px-4 py-2 rounded-full text-[15px] font-bold font-sans text-[#173054] hover:text-[#E97D22] transition-colors">Courses</button>
+              <button onClick={() => navigate('/')} className="px-4 py-2 rounded-full text-[15px] font-bold font-sans text-[#173054] hover:text-[#E97D22] transition-colors">Colleges</button>
+              <button onClick={() => navigate('/about')} className="px-4 py-2 rounded-full text-[15px] font-bold font-sans text-[#173054] hover:text-[#E97D22] transition-colors">About</button>
               
               {user ? (
                 <div className="flex items-center gap-3 ml-4 pl-4 border-l border-slate-200">
                    <div className="flex flex-col items-end">
-                      <span className="text-xs font-bold text-slate-900">{user.name}</span>
-                      <span className="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded uppercase">{user.role}</span>
+                      <span className="text-xs font-bold text-[#173054]">{user.name}</span>
+                      <span className="text-[10px] font-bold text-[#E97D22] bg-orange-50 px-1.5 py-0.5 rounded uppercase">{user.role}</span>
                    </div>
-                   <button onClick={() => navigate('/profile')} className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white font-bold shadow-md hover:shadow-lg transition-all">
+                   <button onClick={() => navigate('/profile')} className="w-10 h-10 rounded-full bg-[#173054] flex items-center justify-center text-white font-bold shadow-md hover:shadow-lg transition-all">
                       {user.name.charAt(0)}
                    </button>
                    <button onClick={handleLogout} className="p-2 text-slate-400 hover:text-red-500 transition-colors">
@@ -193,8 +194,8 @@ function AppContent() {
                    </button>
                 </div>
               ) : (
-                <button onClick={() => navigate('/login')} className="ml-4 px-6 py-2.5 rounded-full bg-slate-900 text-white text-sm font-bold hover:bg-slate-800 transition-all shadow-lg shadow-slate-200">
-                  Sign In
+                <button onClick={() => navigate('/login')} className="ml-4 px-6 py-2.5 rounded-full bg-[#E97D22] text-white text-sm font-bold hover:bg-[#d6721e] transition-colors shadow-lg shadow-orange-200/50">
+                  Get Started
                 </button>
               )}
             </div>
@@ -253,17 +254,26 @@ function AppContent() {
       {/* Floating Contact Buttons */}
       <div className="fixed bottom-20 right-4 z-40 flex flex-col gap-3 md:bottom-8">
           <a 
+            href="http://www.youtube.com/@CollegeGate007" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="bg-[#FF0000] text-white p-3 rounded-full shadow-lg hover:scale-110 transition-transform flex items-center justify-center animate-bounce-in"
+            title="Watch on YouTube"
+          >
+              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+          </a>
+          <a 
             href="https://wa.me/917033827101?text=HELLO%20i%20want%20to%20know%20more" 
             target="_blank" 
             rel="noopener noreferrer"
-            className="bg-[#25D366] text-white p-3 rounded-full shadow-lg hover:scale-110 transition-transform flex items-center justify-center animate-bounce-in"
+            className="bg-[#25D366] text-white p-3 rounded-full shadow-lg hover:scale-110 transition-transform flex items-center justify-center animate-bounce-in delay-75"
             title="Chat on WhatsApp"
           >
               <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.128 1.588 5.911L.061 24l6.171-1.616a11.879 11.879 0 005.821 1.543h.003c6.556 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
           </a>
           <a 
             href="tel:+917033827101" 
-            className="bg-indigo-600 text-white p-3 rounded-full shadow-lg hover:scale-110 transition-transform flex items-center justify-center animate-bounce-in delay-100"
+            className="bg-[#E97D22] text-white p-3 rounded-full shadow-lg hover:scale-110 transition-transform flex items-center justify-center animate-bounce-in delay-150"
             title="Call Now"
           >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
@@ -288,26 +298,46 @@ function AppContent() {
       )}
 
       {/* Footer */}
-      <footer className="bg-slate-900 text-slate-400 py-12 text-center mt-auto border-t border-slate-800">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col items-center gap-3">
-          <p className="text-slate-300 font-medium text-lg">Made with love, proud being an Indian 🇮🇳</p>
-          <div className="flex flex-wrap justify-center items-center gap-4 text-sm mt-2">
-            <a href="tel:+917033827101" className="hover:text-white transition-colors flex items-center gap-1">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
-              Call: 7033827101
-            </a>
-            <span className="text-slate-600 hidden sm:inline">|</span>
-            <a href="https://wa.me/917033827101" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors flex items-center gap-1">
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.128 1.588 5.911L.061 24l6.171-1.616a11.879 11.879 0 005.821 1.543h.003c6.556 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-              WhatsApp: 7033827101
-            </a>
-            <span className="text-slate-600 hidden sm:inline">|</span>
-            <a href="mailto:info@collegegate.in" className="hover:text-white transition-colors flex items-center gap-1">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-              Email: info@collegegate.in
-            </a>
+      <footer className="bg-[#173054] text-[#e2e8f0] py-16 mt-auto">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-8">
+            
+            {/* Left side: Made with love / Copyright */}
+            <div className="flex flex-col items-center md:items-start gap-2 order-3 md:order-1">
+              <p className="text-slate-300 font-medium text-sm">Made with love <span className="text-red-500">❤️</span>, proud being an Indian 🇮🇳</p>
+              <p className="text-xs text-slate-400">© {new Date().getFullYear()} CollegeGate. All rights reserved.</p>
+              <a href="mailto:info@collegegate.in" className="text-sm hover:text-white transition-colors flex items-center gap-2 mt-1">
+                <svg className="w-4 h-4 text-[#E97D22]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                info@collegegate.in
+              </a>
+            </div>
+
+            {/* Center: Logo & Tagline */}
+            <div className="flex flex-col items-center order-1 md:order-2">
+              <div className="flex items-center justify-center cursor-pointer opacity-90 hover:opacity-100 transition-opacity" onClick={() => navigate('/')}>
+                <div className="bg-white p-2 rounded-full shadow-lg">
+                  <Logo className="w-16 h-16" />
+                </div>
+              </div>
+            </div>
+
+            {/* Right side: Contact */}
+            <div className="flex flex-col items-center md:items-end gap-2 order-2 md:order-3">
+              <a href="tel:+917033827101" className="flex items-center gap-2 hover:text-white transition-colors font-bold text-lg">
+                <svg className="w-5 h-5 text-[#E97D22]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
+                <span>70338 27101</span>
+              </a>
+              <a href="https://wa.me/917033827101" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-white transition-colors text-sm">
+                <svg className="w-4 h-4 text-[#E97D22]" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.128 1.588 5.911L.061 24l6.171-1.616a11.879 11.879 0 005.821 1.543h.003c6.556 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                WhatsApp
+              </a>
+              <a href="http://www.youtube.com/@CollegeGate007" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-white transition-colors text-sm">
+                <svg className="w-4 h-4 text-[#E97D22]" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                YouTube
+              </a>
+            </div>
+
           </div>
-          <p className="text-xs mt-4 text-slate-500">© {new Date().getFullYear()} CollegeGate. All rights reserved.</p>
         </div>
       </footer>
     </div>
