@@ -390,6 +390,66 @@ export const UNIVERSITIES_DATA: University[] = [
         logo: 'https://ui-avatars.com/api/?name=Arka+Jain+University&background=random&color=fff&size=128',
         tags: ['First Private University in Region'],
         websiteUrl: 'https://admissioncell.online/university/arka-jain.php'
+    },
+    {
+        id: 'csjmu',
+        name: 'Chatrapati Shahuji Maharaj University',
+        location: 'Kanpur, UP',
+        modes: ['Regular'],
+        image: 'https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&q=80&w=1000',
+        logo: 'https://ui-avatars.com/api/?name=CSJMU&background=random&color=fff&size=128',
+        tags: ['B.Ed. Admission Open 2026', 'UGC Recognized'],
+        websiteUrl: '#'
+    },
+    {
+        id: 'gniot',
+        name: 'Greater Noida Institute of Technology (GNIOT)',
+        location: 'Greater Noida, Delhi NCR',
+        modes: ['Regular'],
+        image: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=1000',
+        logo: 'https://ui-avatars.com/api/?name=GNIOT&background=random&color=fff&size=128',
+        tags: ['NAAC A+', 'AICTE Approved', 'BSCC Supported'],
+        websiteUrl: '#'
+    },
+    {
+        id: 'gku',
+        name: 'Guru Kashi University',
+        location: 'Talwandi Sabo, Punjab',
+        modes: ['Regular'],
+        image: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?auto=format&fit=crop&q=80&w=1000',
+        logo: 'https://ui-avatars.com/api/?name=Guru+Kashi+University&background=random&color=fff&size=128',
+        tags: ['UGC Approved'],
+        websiteUrl: '#'
+    },
+    {
+        id: 'dbu',
+        name: 'Desh Bhagat University',
+        location: 'Mandi Gobindgarh, Punjab',
+        modes: ['Regular'],
+        image: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&q=80&w=1000',
+        logo: 'https://ui-avatars.com/api/?name=Desh+Bhagat+University&background=random&color=fff&size=128',
+        tags: ['NAAC Accredited', 'UGC Approved', '100% Job Valid Degree'],
+        websiteUrl: '#'
+    },
+    {
+        id: 'riit',
+        name: 'Roorkee Institute of Technology (RIT)',
+        location: 'Roorkee, Uttarakhand',
+        modes: ['Regular'],
+        image: 'https://images.unsplash.com/photo-1592280771884-131185386d28?auto=format&fit=crop&q=80&w=1000',
+        logo: 'https://ui-avatars.com/api/?name=RIT&background=random&color=fff&size=128',
+        tags: ['NAAC Accredited', 'AICTE Approved'],
+        websiteUrl: '#'
+    },
+    {
+        id: 'niu',
+        name: 'Noida International University',
+        location: 'Greater Noida, UP',
+        modes: ['Regular'],
+        image: 'https://images.unsplash.com/photo-1564981797816-1043664bf78d?auto=format&fit=crop&q=80&w=1000',
+        logo: 'https://ui-avatars.com/api/?name=NIU&background=random&color=fff&size=128',
+        tags: ['NAAC Accredited', 'UGC Approved'],
+        websiteUrl: '#'
     }
 ];
 

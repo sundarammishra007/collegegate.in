@@ -79,6 +79,26 @@ service cloud.firestore {
              (!('crmAccess' in data) || data.crmAccess is bool);
     }
 
+    function isValidUniversity(data) {
+      return data.keys().hasAll(['name']) &&
+             data.name is string && data.name.size() > 0 && data.name.size() < 200 &&
+             (!('location' in data) || (data.location is string && data.location.size() < 200)) &&
+             (!('image' in data) || (data.image is string && data.image.size() < 500)) &&
+             (!('websiteUrl' in data) || (data.websiteUrl is string && data.websiteUrl.size() < 500)) &&
+             (!('description' in data) || (data.description is string && data.description.size() < 2000)) &&
+             (!('modes' in data) || (data.modes is list)) &&
+             (!('courses' in data) || (data.courses is list));
+    }
+
+    function isValidCourse(data) {
+      return data.keys().hasAll(['name', 'type']) &&
+             data.name is string && data.name.size() > 0 && data.name.size() < 200 &&
+             data.type in ['Diploma', 'UG', 'PG'] &&
+             (!('description' in data) || (data.description is string && data.description.size() < 2000)) &&
+             (!('universityId' in data) || (data.universityId is string && data.universityId.size() < 100)) &&
+             (!('modes' in data) || (data.modes is list));
+    }
+
     // ===============================================================
     // Rules
     // ===============================================================
@@ -118,6 +138,16 @@ service cloud.firestore {
       allow create: if isAuthenticated(); // Allow any auth user to submit inquiry
       
       allow update: if isAuthenticated() && (isAdmin() || (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.crmAccess == true));
+    }
+
+    match /universities/{universityId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin() && isValidUniversity(request.resource.data);
+    }
+
+    match /courses/{courseId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin() && isValidCourse(request.resource.data);
     }
   }
 }

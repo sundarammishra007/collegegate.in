@@ -37,6 +37,34 @@
         "timestamp": { "type": "string" }
       },
       "required": ["studentName", "email", "query"]
+    },
+    "University": {
+      "title": "University",
+      "description": "A university entity",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "location": { "type": "string" },
+        "modes": { "type": "array", "items": { "type": "string", "enum": ["Regular", "Online", "Distance"] } },
+        "image": { "type": "string" },
+        "websiteUrl": { "type": "string" },
+        "description": { "type": "string" },
+        "courses": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["name"]
+    },
+    "Course": {
+      "title": "Course",
+      "description": "A course offered by a university",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "type": { "type": "string", "enum": ["Diploma", "UG", "PG"] },
+        "modes": { "type": "array", "items": { "type": "string", "enum": ["Regular", "Online", "Distance"] } },
+        "description": { "type": "string" },
+        "universityId": { "type": "string" }
+      },
+      "required": ["name", "type"]
     }
   },
   "firestore": {
@@ -47,6 +75,14 @@
     "inquiries/{inquiryId}": {
       "schema": "Inquiry",
       "description": "All student inquiries"
+    },
+    "universities/{universityId}": {
+      "schema": "University",
+      "description": "List of universities"
+    },
+    "courses/{courseId}": {
+      "schema": "Course",
+      "description": "List of courses"
     }
   }
 }

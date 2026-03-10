@@ -53,10 +53,15 @@ const SignIn: React.FC<SignInProps> = ({ onLogin, onCancel }) => {
           mobile: formData.mobile,
           whatsapp: formData.whatsapp || formData.mobile,
           timestamp: new Date().toISOString(),
-          specialization: (activeTab === 'COLLEGE_PARTNER' || activeTab === 'ASSOCIATE_PARTNER') ? formData.specialization : undefined,
-          studentId: activeTab === 'STUDENT' ? `ST-${Math.floor(Math.random() * 10000)}` : undefined,
           banned: false
       };
+
+      if (activeTab === 'COLLEGE_PARTNER' || activeTab === 'ASSOCIATE_PARTNER') {
+          newUser.specialization = formData.specialization || '';
+      }
+      if (activeTab === 'STUDENT') {
+          newUser.studentId = `ST-${Math.floor(Math.random() * 10000)}`;
+      }
       
       await setDoc(doc(db, 'users', uid), newUser);
       return newUser;

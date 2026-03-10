@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { User, College, Course, Inquiry, UserRole } from '../types';
 import { UNIVERSITIES_DATA } from '../constants';
 import { subscribeToAllUsers, updateUserProfile } from '../services/firebase';
+import { UniversityManager } from './UniversityManager';
 
 interface AdminDashboardProps {
     colleges: College[];
