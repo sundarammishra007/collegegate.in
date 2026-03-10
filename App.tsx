@@ -11,7 +11,6 @@ import CollegeInquiry from './components/CollegeInquiry';
 import CompareView from './components/CompareView';
 import CollegeDetailView from './components/CollegeDetailView';
 import UniversityDetailView from './components/UniversityDetailView';
-import RegularUniversities from './components/RegularUniversities';
 import SignIn from './components/SignIn';
 import AdminDashboard from './components/AdminDashboard';
 import CounselorDashboard from './components/CounselorDashboard';
@@ -175,20 +174,12 @@ function AppContent() {
               </span>
             </div>
             
-import RegularUniversities from './components/RegularUniversities';
-
-// ... existing imports
-
-// ... inside AppContent component
-
             <div className="hidden md:flex items-center space-x-1">
               <button onClick={() => navigate('/')} className="px-4 py-2 rounded-full text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-indigo-600 transition-all">Home</button>
-              <button onClick={() => navigate('/regular-universities')} className="px-4 py-2 rounded-full text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-indigo-600 transition-all">Regular Admission</button>
               <button onClick={() => navigate('/skills')} className="px-4 py-2 rounded-full text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-indigo-600 transition-all">Skills & AI</button>
               <button onClick={() => navigate('/about')} className="px-4 py-2 rounded-full text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-indigo-600 transition-all">About</button>
               
               {user ? (
-
                 <div className="flex items-center gap-3 ml-4 pl-4 border-l border-slate-200">
                    <div className="flex flex-col items-end">
                       <span className="text-xs font-bold text-slate-900">{user.name}</span>
@@ -233,7 +224,6 @@ import RegularUniversities from './components/RegularUniversities';
         <Route path="/profile" element={user ? <StudentProfile user={user} onUpdateUser={setUser} onBack={() => navigate('/')} /> : <Navigate to="/login" />} />
         <Route path="/university/:id" element={<UniversityDetailRoute onInquiry={() => setShowInquiryModal(true)} />} />
         <Route path="/college/:id" element={<CollegeDetailRoute colleges={colleges} onInquiry={() => setShowInquiryModal(true)} onCompare={handleCompare} isComparing={false} />} />
-        <Route path="/regular-universities" element={<RegularUniversities />} />
       </Routes>
 
       {/* Mobile Bottom Navigation */}
@@ -242,10 +232,6 @@ import RegularUniversities from './components/RegularUniversities';
           <button onClick={() => navigate('/')} className="flex flex-col items-center justify-center w-full h-full text-indigo-600">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
             <span className="text-[10px] font-bold mt-1">Home</span>
-          </button>
-          <button onClick={() => navigate('/regular-universities')} className="flex flex-col items-center justify-center w-full h-full text-slate-400 hover:text-indigo-600">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
-            <span className="text-[10px] font-bold mt-1">Regular</span>
           </button>
           <button onClick={() => navigate('/skills')} className="flex flex-col items-center justify-center w-full h-full text-slate-400 hover:text-indigo-600">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
@@ -265,7 +251,7 @@ import RegularUniversities from './components/RegularUniversities';
       {/* Floating Contact Buttons */}
       <div className="fixed bottom-20 right-4 z-40 flex flex-col gap-3 md:bottom-8">
           <a 
-            href="https://wa.me/917033827101" 
+            href="https://wa.me/917033827101?text=HELLO%20i%20want%20to%20know%20more" 
             target="_blank" 
             rel="noopener noreferrer"
             className="bg-[#25D366] text-white p-3 rounded-full shadow-lg hover:scale-110 transition-transform flex items-center justify-center animate-bounce-in"
