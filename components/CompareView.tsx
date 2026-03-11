@@ -46,7 +46,7 @@ const CompareView: React.FC<CompareViewProps> = ({ colleges, onRemove, onBack })
                 ✕
               </button>
               <div className="h-32 w-full mb-3 rounded-lg overflow-hidden">
-                <img src={college.image} alt={college.name} className="w-full h-full object-cover" />
+                <img src={college.image} alt={college.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
               </div>
               <h3 className="font-bold text-gray-800 text-sm md:text-base">{college.name}</h3>
               <p className="text-xs text-gray-500 mt-1">{college.location}</p>

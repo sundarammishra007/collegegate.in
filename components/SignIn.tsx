@@ -331,7 +331,7 @@ const SignIn: React.FC<SignInProps> = ({ onLogin, onCancel }) => {
                         disabled={loading}
                         className="w-full py-3 rounded-xl border border-slate-200 font-bold text-slate-700 hover:bg-slate-50 transition-colors flex items-center justify-center gap-2"
                     >
-                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
+                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" referrerPolicy="no-referrer" />
                         Sign in with Google
                     </button>
 

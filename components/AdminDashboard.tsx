@@ -218,10 +218,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ colleges, setColleges, 
               {universities.map((uni) => (
                   <div key={uni.id} className="flex items-center justify-between p-4 border border-slate-100 rounded-xl hover:shadow-md transition-all">
                       <div className="flex items-center gap-4">
-                          <img src={uni.image} alt={uni.name} className="w-16 h-16 rounded-lg object-cover" />
+                          <img src={uni.image} alt={uni.name} className="w-16 h-16 rounded-lg object-cover" referrerPolicy="no-referrer" />
                           <div>
                               <div className="flex items-center gap-2">
-                                  {uni.logo && <img src={uni.logo} alt="logo" className="w-6 h-6 rounded-full object-contain border border-slate-100" />}
+                                  {uni.logo && <img src={uni.logo} alt="logo" className="w-6 h-6 rounded-full object-contain border border-slate-100" referrerPolicy="no-referrer" />}
                                   <h4 className="font-bold text-slate-800">{uni.name}</h4>
                               </div>
                               <p className="text-xs text-slate-500 mt-0.5">{uni.location}</p>

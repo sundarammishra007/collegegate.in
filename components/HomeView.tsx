@@ -64,6 +64,7 @@ const HomeView: React.FC<HomeViewProps> = ({
                 src={img} 
                 alt="Hero Background" 
                 className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${index === currentImageIndex ? 'opacity-100' : 'opacity-0'}`} 
+                referrerPolicy="no-referrer"
               />
             ))}
             <div className="absolute inset-0 bg-gradient-to-r from-indigo-900/90 to-violet-900/80"></div>
@@ -172,7 +173,7 @@ const HomeView: React.FC<HomeViewProps> = ({
                           </div>
 
                           <div className="w-24 h-24 rounded-full overflow-hidden mb-4 border-4 border-slate-50 group-hover:border-indigo-50 transition-colors">
-                              <img src={uni.image} alt={uni.name} className="w-full h-full object-cover" />
+                              <img src={uni.image} alt={uni.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                           </div>
                           <h4 className="font-bold text-slate-800 mb-1 leading-tight">{uni.name}</h4>
                           <p className="text-xs text-slate-500 mb-3">{uni.location}</p>

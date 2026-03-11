@@ -35,6 +35,7 @@ const UniversityDetailView: React.FC<UniversityDetailViewProps> = ({ university,
             src={university.image} 
             alt={university.name} 
             className="w-full h-full object-cover opacity-60"
+            referrerPolicy="no-referrer"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent"></div>
         

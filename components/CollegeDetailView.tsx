@@ -69,6 +69,7 @@ const CollegeDetailView: React.FC<CollegeDetailViewProps> = ({ college, onBack, 
             alt={college.name} 
             className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-[20s]"
             onError={() => setImageError(true)}
+            referrerPolicy="no-referrer"
           />
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-slate-800 to-slate-900">

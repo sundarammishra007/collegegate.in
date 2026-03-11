@@ -68,7 +68,7 @@ const SkillsSection: React.FC = () => {
                             className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all group block border border-slate-100 cursor-pointer"
                         >
                             <div className="h-40 overflow-hidden relative">
-                                <img src={course.image} alt={course.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                                <img src={course.image} alt={course.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" referrerPolicy="no-referrer" />
                                 <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-2xl shadow-sm">
                                     {course.flag}
                                 </div>
@@ -136,7 +136,7 @@ const SkillsSection: React.FC = () => {
                             className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all group block border border-slate-100 cursor-pointer"
                         >
                             <div className="h-40 overflow-hidden relative">
-                                <img src={course.image} alt={course.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                                <img src={course.image} alt={course.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" referrerPolicy="no-referrer" />
                                 <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-2xl shadow-sm">
                                     {course.icon}
                                 </div>
@@ -204,7 +204,7 @@ const SkillsSection: React.FC = () => {
                             className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all group block border border-slate-100 cursor-pointer"
                         >
                             <div className="h-40 overflow-hidden relative">
-                                <img src={course.image} alt={course.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                                <img src={course.image} alt={course.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" referrerPolicy="no-referrer" />
                                 <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-2xl shadow-sm">
                                     {course.icon}
                                 </div>
@@ -261,7 +261,7 @@ const SkillsSection: React.FC = () => {
                             className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all group block border border-slate-100 cursor-pointer"
                         >
                             <div className="h-48 overflow-hidden relative">
-                                <img src={course.image} alt={course.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                                <img src={course.image} alt={course.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" referrerPolicy="no-referrer" />
                                 <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-slate-800">
                                     {course.category}
                                 </div>

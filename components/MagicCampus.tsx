@@ -225,7 +225,7 @@ const MagicCampus: React.FC = () => {
                 }`}
             >
                 {selectedImage ? (
-                    <img src={selectedImage} alt="Input" className="w-full h-full object-contain absolute inset-0 max-h-[300px]" />
+                    <img src={selectedImage} alt="Input" className="w-full h-full object-contain absolute inset-0 max-h-[300px]" referrerPolicy="no-referrer" />
                 ) : (
                     <div className="text-center p-4">
                         <span className="text-4xl mb-2 block">
@@ -340,7 +340,7 @@ const MagicCampus: React.FC = () => {
                 
                 {mode === 'image' && generatedImage && (
                     <div className="relative w-full h-full group">
-                        <img src={generatedImage} alt="Generated" className="w-full h-full object-contain" />
+                        <img src={generatedImage} alt="Generated" className="w-full h-full object-contain" referrerPolicy="no-referrer" />
                         <a 
                             href={generatedImage} 
                             download="magic-campus.png"
