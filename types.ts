@@ -97,4 +97,5 @@ export interface Inquiry {
   status: 'PENDING' | 'ANSWERED';
   notes?: string[]; // New field for CRM notes
   collegeId?: string; // To link inquiry to specific college
+  assignedTo?: string; // ID of the counselor/associate assigned
 }

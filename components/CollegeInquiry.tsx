@@ -45,8 +45,8 @@ const CollegeInquiry: React.FC<CollegeInquiryProps> = ({ user, collegeName, onSu
         <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
           <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
         </div>
-        <h2 className="text-2xl font-bold text-slate-800 mb-2">Inquiry Sent!</h2>
-        <p className="text-slate-500 mb-6">Our counselors will contact you shortly via WhatsApp or Phone.</p>
+        <h2 className="text-2xl font-bold text-slate-800 mb-2">Thank you for connecting CollegeGate</h2>
+        <p className="text-slate-500 mb-6">we will be get back to you soon</p>
         <button onClick={onClose} className="px-6 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-all w-full">Close</button>
       </div>
     );

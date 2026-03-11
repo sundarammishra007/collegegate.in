@@ -14,17 +14,42 @@ const CollegePartnerDashboard: React.FC<CollegePartnerDashboardProps> = ({ partn
   // For demo purposes, we'll assume the partner is linked to the first college if not specified
   // In a real app, the user object would have a collegeId
   const [myCollege, setMyCollege] = useState<College>(colleges[0]); 
-  const [activeTab, setActiveTab] = useState<'overview' | 'details' | 'inquiries'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'details' | 'inquiries' | 'add_college'>('overview');
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState<College>(colleges[0]);
+  const [newCollegeForm, setNewCollegeForm] = useState<Partial<College>>({
+    name: '',
+    location: '',
+    fees: '',
+    rating: 0,
+    type: 'Private',
+    image: 'https://picsum.photos/seed/college/800/600',
+    description: '',
+    courses: []
+  });
 
-  // Filter inquiries for this college (mock logic: matching by name or just showing all for demo)
-  const myInquiries = inquiries.filter(i => i.query.toLowerCase().includes(myCollege.name.toLowerCase()) || true); // Showing all for demo
+  // Filter inquiries assigned to this partner
+  const myInquiries = inquiries.filter(i => i.assignedTo === partner.id);
 
   const handleSave = () => {
     setColleges(prev => prev.map(c => c.id === myCollege.id ? editForm : c));
     setMyCollege(editForm);
     setIsEditing(false);
+  };
+
+  const handleAddCollege = () => {
+    if (!newCollegeForm.name || !newCollegeForm.location) {
+      alert("Please fill in required fields");
+      return;
+    }
+    const newCollege: College = {
+      ...newCollegeForm,
+      id: Date.now().toString(),
+    } as College;
+    setColleges(prev => [...prev, newCollege]);
+    setMyCollege(newCollege);
+    setActiveTab('details');
+    alert("College Added Successfully!");
   };
 
   const handleMarkAnswered = async (inquiryId: string) => {
@@ -72,7 +97,7 @@ const CollegePartnerDashboard: React.FC<CollegePartnerDashboardProps> = ({ partn
 
         {/* Navigation Tabs */}
         <div className="flex gap-2 mb-8 overflow-x-auto pb-2">
-          {['overview', 'details', 'inquiries'].map((tab) => (
+          {['overview', 'details', 'inquiries', 'add_college'].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab as any)}
@@ -82,10 +107,80 @@ const CollegePartnerDashboard: React.FC<CollegePartnerDashboardProps> = ({ partn
                   : 'bg-white text-slate-500 hover:bg-slate-100'
               }`}
             >
-              {tab.charAt(0).toUpperCase() + tab.slice(1)}
+              {tab === 'add_college' ? 'Add College' : tab.charAt(0).toUpperCase() + tab.slice(1)}
             </button>
           ))}
         </div>
+
+        {activeTab === 'add_college' && (
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+            <div className="p-6 border-b border-slate-100 bg-slate-50">
+              <h3 className="font-bold text-lg text-slate-800">Add New College</h3>
+            </div>
+            <div className="p-6 md:p-8 space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 uppercase mb-1">College Name</label>
+                  <input 
+                    type="text" 
+                    value={newCollegeForm.name}
+                    onChange={(e) => setNewCollegeForm({...newCollegeForm, name: e.target.value})}
+                    className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    placeholder="e.g. New Tech Institute"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Location</label>
+                  <input 
+                    type="text" 
+                    value={newCollegeForm.location}
+                    onChange={(e) => setNewCollegeForm({...newCollegeForm, location: e.target.value})}
+                    className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    placeholder="e.g. Mumbai, Maharashtra"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Fees Structure</label>
+                  <input 
+                    type="text" 
+                    value={newCollegeForm.fees}
+                    onChange={(e) => setNewCollegeForm({...newCollegeForm, fees: e.target.value})}
+                    className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    placeholder="e.g. ₹1.5L - ₹3L / year"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Type</label>
+                  <select 
+                    value={newCollegeForm.type}
+                    onChange={(e) => setNewCollegeForm({...newCollegeForm, type: e.target.value as any})}
+                    className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  >
+                    <option value="Private">Private</option>
+                    <option value="Public">Public</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Description</label>
+                <textarea 
+                  value={newCollegeForm.description}
+                  onChange={(e) => setNewCollegeForm({...newCollegeForm, description: e.target.value})}
+                  className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 min-h-[100px]"
+                  placeholder="Enter college description..."
+                />
+              </div>
+              <div className="flex justify-end">
+                <button 
+                  onClick={handleAddCollege}
+                  className="px-6 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-colors"
+                >
+                  Add College
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {activeTab === 'overview' && (
           <div className="space-y-6">
