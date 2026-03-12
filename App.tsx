@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { HashRouter, Routes, Route, useNavigate, Navigate, useParams } from 'react-router-dom';
-import { NavView, College, User, Inquiry, Course, CourseMode } from './types';
+import { NavView, College, User, Inquiry, Course, CourseMode, University } from './types';
 import { MOCK_COLLEGES, COURSES_DATA, UNIVERSITIES_DATA } from './constants';
 import { auth, db, saveUserToFirestore, getUserProfile, addInquiry, subscribeToInquiries } from './services/firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
@@ -20,12 +20,14 @@ import Logo from './components/Logo';
 import About from './components/About';
 import StudentProfile from './components/StudentProfile';
 import HomeView from './components/HomeView';
+import { NavDropdown } from './components/NavDropdown';
+import { LoginModal } from './components/LoginModal';
 
 // Wrapper for University Detail to use params
-const UniversityDetailRoute = ({ onInquiry }: { onInquiry: () => void }) => {
+const UniversityDetailRoute = ({ universities, onInquiry }: { universities: University[], onInquiry: () => void }) => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const university = UNIVERSITIES_DATA.find(u => u.id === id);
+  const university = universities.find(u => u.id === id);
   
   if (!university) return <Navigate to="/" />;
   
@@ -71,10 +73,12 @@ function AppContent() {
   // Filter States
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedMode, setSelectedMode] = useState<CourseMode>('Regular');
+  const [selectedCountry, setSelectedCountry] = useState<'All' | 'India' | 'Abroad'>('All');
   
   // UI States
   const [compareList, setCompareList] = useState<string[]>([]);
   const [showInquiryModal, setShowInquiryModal] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
   const [activeTab, setActiveTab] = useState<'all' | 'courses' | 'colleges'>('all');
 
   useEffect(() => {
@@ -178,8 +182,45 @@ function AppContent() {
             
             <div className="hidden md:flex items-center space-x-2">
               <button onClick={() => { setActiveTab('all'); navigate('/'); }} className={`px-4 py-2 rounded-full text-[15px] font-bold font-sans transition-colors ${activeTab === 'all' ? 'text-[#E97D22]' : 'text-[#173054] hover:text-[#E97D22]'}`}>Home</button>
-              <button onClick={() => { setActiveTab('courses'); navigate('/'); }} className={`px-4 py-2 rounded-full text-[15px] font-bold font-sans transition-colors ${activeTab === 'courses' ? 'text-[#E97D22]' : 'text-[#173054] hover:text-[#E97D22]'}`}>Courses</button>
-              <button onClick={() => { setActiveTab('colleges'); navigate('/'); }} className={`px-4 py-2 rounded-full text-[15px] font-bold font-sans transition-colors ${activeTab === 'colleges' ? 'text-[#E97D22]' : 'text-[#173054] hover:text-[#E97D22]'}`}>Colleges</button>
+              <NavDropdown 
+                title="Study Modes" 
+                items={[
+                  { label: 'Regular', onClick: () => { setSelectedMode('Regular'); navigate('/'); } },
+                  { label: 'Online', onClick: () => { setSelectedMode('Online'); navigate('/'); } },
+                  { label: 'Distance', onClick: () => { setSelectedMode('Distance'); navigate('/'); } }
+                ]} 
+              />
+              <NavDropdown 
+                title="Universities" 
+                items={[
+                  { label: 'Indian', onClick: () => { setSelectedCountry('India'); setActiveTab('colleges'); navigate('/'); } },
+                  { label: 'Global', onClick: () => { setSelectedCountry('Abroad'); setActiveTab('colleges'); navigate('/'); } }
+                ]} 
+              />
+              <NavDropdown 
+                title="News" 
+                items={[
+                  { label: 'Media Source' },
+                  { label: 'Official College/University Sources' }
+                ]} 
+              />
+              <NavDropdown 
+                title="Exams" 
+                items={[
+                  { label: 'Top Exams' },
+                  { label: 'Cut-offs' }
+                ]} 
+              />
+              <NavDropdown 
+                title="Opportunities" 
+                items={[
+                  { label: 'Apprenticeship' },
+                  { label: 'Internship' },
+                  { label: 'Job Fair' },
+                  { label: 'Hackathon' },
+                  { label: 'Freelancing' }
+                ]} 
+              />
               <button onClick={() => navigate('/about')} className="px-4 py-2 rounded-full text-[15px] font-bold font-sans text-[#173054] hover:text-[#E97D22] transition-colors">About</button>
               
               {user ? (
@@ -213,11 +254,14 @@ function AppContent() {
               setSearchTerm={setSearchTerm}
               selectedMode={selectedMode}
               setSelectedMode={setSelectedMode}
+              selectedCountry={selectedCountry}
               courses={courses}
               universities={universities}
+              colleges={colleges}
               activeTab={activeTab}
               onInquiry={() => setShowInquiryModal(true)}
-              onUniversityClick={(id) => navigate(`/university/${id}`)}
+              onUniversityClick={(id) => user ? navigate(`/university/${id}`) : setShowLoginModal(true)}
+              onCollegeClick={(id) => user ? navigate(`/college/${id}`) : setShowLoginModal(true)}
               onAboutClick={() => navigate('/about')}
             />
           } />
@@ -228,7 +272,7 @@ function AppContent() {
           <Route path="/skills" element={<SkillsSection />} />
           <Route path="/about" element={<About />} />
           <Route path="/profile" element={user ? <StudentProfile user={user} onUpdateUser={setUser} onBack={() => navigate('/')} /> : <Navigate to="/login" />} />
-          <Route path="/university/:id" element={<UniversityDetailRoute onInquiry={() => setShowInquiryModal(true)} />} />
+          <Route path="/university/:id" element={<UniversityDetailRoute universities={universities} onInquiry={() => setShowInquiryModal(true)} />} />
           <Route path="/college/:id" element={<CollegeDetailRoute colleges={colleges} onInquiry={() => setShowInquiryModal(true)} onCompare={handleCompare} isComparing={false} />} />
         </Routes>
       </main>
@@ -401,6 +445,7 @@ function AppContent() {
         </div>
       </footer>
 
+      <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
     </div>
   );
 }

@@ -98,6 +98,16 @@ const UniversityDetailView: React.FC<UniversityDetailViewProps> = ({ university,
                                         <span className="bg-slate-100 text-slate-500 text-[10px] px-2 py-1 rounded font-bold uppercase">{course.type}</span>
                                     </div>
                                     <p className="text-xs text-slate-500 mb-4 line-clamp-2">{course.description}</p>
+                                    <div className="flex flex-col gap-2 mb-4">
+                                        <div className="flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded w-fit">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                            Ongoing Course
+                                        </div>
+                                        <div className="flex items-center gap-1 text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded w-fit">
+                                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                            Official Admission Partner
+                                        </div>
+                                    </div>
                                     <div className="mt-auto flex items-center justify-between">
                                         <div className="flex gap-1">
                                             {course.modes.filter(m => university.modes.includes(m)).map(m => (

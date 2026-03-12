@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Course, CourseMode, University } from '../types';
+import { Course, CourseMode, University, College } from '../types';
 import { UNIVERSITIES_DATA } from '../constants';
 
 interface HomeViewProps {
@@ -7,11 +7,14 @@ interface HomeViewProps {
   setSearchTerm: (term: string) => void;
   selectedMode: CourseMode;
   setSelectedMode: (mode: CourseMode) => void;
+  selectedCountry?: 'All' | 'India' | 'Abroad';
   courses: Course[];
   universities: University[];
+  colleges: College[];
   activeTab: 'all' | 'courses' | 'colleges';
   onInquiry: () => void;
   onUniversityClick: (id: string) => void;
+  onCollegeClick: (id: string) => void;
   onAboutClick: () => void;
 }
 
@@ -26,11 +29,14 @@ const HomeView: React.FC<HomeViewProps> = ({
   setSearchTerm,
   selectedMode,
   setSelectedMode,
+  selectedCountry = 'All',
   courses,
   universities,
+  colleges,
   activeTab,
   onInquiry,
   onUniversityClick,
+  onCollegeClick,
   onAboutClick
 }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -126,16 +132,26 @@ const HomeView: React.FC<HomeViewProps> = ({
                               </div>
                               <h4 className="font-bold text-slate-800 text-lg mb-2 leading-tight group-hover:text-indigo-600 transition-colors">{course.name}</h4>
                               <p className="text-sm text-slate-500 mb-4 line-clamp-2">{course.description}</p>
-                              <div className="flex gap-2 mt-auto">
-                                  {course.modes.map(m => (
-                                      <span key={m} className={`text-[10px] px-2 py-0.5 rounded font-bold ${
-                                          m === 'Regular' ? 'bg-indigo-50 text-indigo-600' :
-                                          m === 'Online' ? 'bg-emerald-50 text-emerald-600' :
-                                          'bg-orange-50 text-orange-600'
-                                      }`}>
-                                          {m}
-                                      </span>
-                                  ))}
+                              <div className="flex flex-col gap-2 mt-auto">
+                                  <div className="flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded w-fit">
+                                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                      Ongoing Course
+                                  </div>
+                                  <div className="flex items-center gap-1 text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded w-fit">
+                                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                      Official Admission Partner
+                                  </div>
+                                  <div className="flex gap-2 mt-2">
+                                      {course.modes.map(m => (
+                                          <span key={m} className={`text-[10px] px-2 py-0.5 rounded font-bold ${
+                                              m === 'Regular' ? 'bg-indigo-50 text-indigo-600' :
+                                              m === 'Online' ? 'bg-emerald-50 text-emerald-600' :
+                                              'bg-orange-50 text-orange-600'
+                                          }`}>
+                                              {m}
+                                          </span>
+                                      ))}
+                                  </div>
                               </div>
                           </div>
                       ))}
@@ -159,8 +175,9 @@ const HomeView: React.FC<HomeViewProps> = ({
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                   {universities.filter(u => 
-                    (u.modes.includes(selectedMode) || u.modes.includes('Regular')) &&
-                    u.name.toLowerCase().includes(searchTerm.toLowerCase())
+                    u.modes.includes(selectedMode) &&
+                    u.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+                    (selectedCountry === 'All' || u.country === selectedCountry)
                   ).map((uni) => (
                       <div 
                         key={uni.id} 
@@ -182,13 +199,52 @@ const HomeView: React.FC<HomeViewProps> = ({
                                   <span key={idx} className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-bold">{tag}</span>
                               ))}
                           </div>
-                          <div className="mt-auto flex gap-1">
-                              {uni.modes.map(m => (
-                                  <span key={m} className={`w-2 h-2 rounded-full ${m === 'Regular' ? 'bg-indigo-400' : m === 'Online' ? 'bg-emerald-400' : 'bg-orange-400'}`} title={m}></span>
-                              ))}
+                          <div className="mt-auto flex flex-col items-center gap-3 w-full">
+                              <div className="flex gap-1">
+                                  {uni.modes.map(m => (
+                                      <span key={m} className={`w-2 h-2 rounded-full ${m === 'Regular' ? 'bg-indigo-400' : m === 'Online' ? 'bg-emerald-400' : 'bg-orange-400'}`} title={m}></span>
+                                  ))}
+                              </div>
+                              <button className="w-full py-2 bg-indigo-50 text-indigo-600 font-bold text-xs rounded-lg group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                                  More Details
+                              </button>
                           </div>
                       </div>
                   ))}
+              </div>
+              <div className="mt-16 pt-16 border-t border-slate-200">
+                  <h3 className="text-2xl font-black text-slate-800 mb-8 flex items-center gap-2">
+                      <span className="w-2 h-8 bg-emerald-500 rounded-full"></span>
+                      Top Colleges
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                      {colleges.filter(c => 
+                        c.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+                        (selectedCountry === 'All' || c.country === selectedCountry)
+                      ).map((college) => (
+                          <div 
+                            key={college.id} 
+                            className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm hover:shadow-md transition-all flex flex-col items-center text-center group cursor-pointer relative overflow-hidden"
+                            onClick={() => onCollegeClick(college.id)}
+                          >
+                              <div className="w-24 h-24 rounded-full overflow-hidden mb-4 border-4 border-slate-50 group-hover:border-emerald-50 transition-colors">
+                                  <img src={college.image} alt={college.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                              </div>
+                              <h4 className="font-bold text-slate-800 mb-1 leading-tight">{college.name}</h4>
+                              <p className="text-xs text-slate-500 mb-3">{college.location}</p>
+                              <div className="flex flex-wrap justify-center gap-1 mb-3">
+                                  {college.tags.map((tag, idx) => (
+                                      <span key={idx} className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-bold">{tag}</span>
+                                  ))}
+                              </div>
+                              <div className="mt-auto w-full">
+                                  <button className="w-full py-2 bg-emerald-50 text-emerald-600 font-bold text-xs rounded-lg group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                                      More Details
+                                  </button>
+                              </div>
+                          </div>
+                      ))}
+                  </div>
               </div>
           </div>
         )}

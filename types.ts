@@ -13,6 +13,7 @@ export interface University {
   id: string;
   name: string;
   location: string;
+  country?: 'India' | 'Abroad';
   modes: CourseMode[];
   image: string;
   logo?: string;
@@ -24,12 +25,12 @@ export interface College {
   id: string;
   name: string;
   location: string;
-  country: 'India' | 'Abroad';
-  ranking: number;
+  country?: 'India' | 'Abroad';
+  ranking?: number;
   fees: string;
-  exams: string[];
+  exams?: string[];
   image: string;
-  description: string;
+  description?: string;
   tags: string[];
   accreditation?: string;
   facilities?: string[];
@@ -37,6 +38,13 @@ export interface College {
   establishedYear?: number;
   placementRecord?: string;
   applicationDeadline?: string;
+  rating?: number;
+  reviews?: number;
+  logo?: string;
+  courses?: string[];
+  placement?: string;
+  type?: string;
+  established?: string;
 }
 
 export enum NavView {
