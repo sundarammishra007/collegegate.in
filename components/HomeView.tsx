@@ -62,29 +62,45 @@ const HomeView: React.FC<HomeViewProps> = ({
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 relative pb-24 md:pb-12">
-      <div className="mb-6 relative rounded-3xl overflow-hidden shadow-xl shadow-indigo-200/50 min-h-[300px] flex items-center">
-         <div className="absolute inset-0">
-            {HERO_IMAGES.map((img, index) => (
-              <img 
-                key={img}
-                src={img} 
-                alt="Hero Background" 
-                className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${index === currentImageIndex ? 'opacity-100' : 'opacity-0'}`} 
-                referrerPolicy="no-referrer"
-              />
-            ))}
-            <div className="absolute inset-0 bg-gradient-to-r from-indigo-900/90 to-violet-900/80"></div>
+      <div className="mb-6 relative rounded-3xl overflow-hidden shadow-xl shadow-indigo-200/50 min-h-[400px] flex items-center">
+         <div className="absolute inset-0 bg-black">
+            <video 
+              autoPlay 
+              loop 
+              muted 
+              playsInline 
+              className="absolute inset-0 w-full h-full object-cover"
+              poster="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&q=80&w=2000"
+            >
+              <source src="https://cdn.pixabay.com/video/2020/05/25/40130-424883478_large.mp4" type="video/mp4" />
+              {/* Fallback image if video fails */}
+              <img src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&q=80&w=2000" alt="Campus" className="w-full h-full object-cover" />
+            </video>
+            {/* 40% dark overlay */}
+            <div className="absolute inset-0 bg-black/40"></div>
          </div>
-         <div className="relative z-10 p-8 md:p-12 text-white flex flex-col md:flex-row items-center justify-between w-full">
-             <div className="mb-6 md:mb-0 max-w-2xl">
-                <h2 className="text-4xl md:text-5xl font-black mb-4 leading-tight">Your Future Starts Here</h2>
-                <p className="text-indigo-100 text-lg md:text-xl font-medium">Explore top courses and universities to build your dream career.</p>
+         <div className="relative z-10 p-8 md:p-12 text-white flex flex-col items-center justify-center w-full text-center">
+             <div className="mb-8 max-w-3xl">
+                <h2 className="text-4xl md:text-6xl font-black mb-6 leading-tight tracking-tight">Bridge the Gap from Campus to Career.</h2>
+                <p className="text-slate-200 text-lg md:text-xl font-medium leading-relaxed">Access real-time cut-offs, premium internships, and world-class courses. Don't just get a degree—build a future.</p>
              </div>
-             <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-                  <button onClick={onInquiry} className="bg-[#E97D22] text-white px-8 py-4 rounded-2xl font-bold hover:bg-[#d6721e] transition-all shadow-lg shadow-orange-500/30 text-center whitespace-nowrap">Enquire Now</button>
-                  <button onClick={onAboutClick} className="bg-white/10 backdrop-blur-md text-white border border-white/20 px-8 py-4 rounded-2xl font-bold hover:bg-white/20 transition-all text-center whitespace-nowrap">About Us</button>
+             <div className="flex flex-col items-center gap-4 w-full md:w-auto">
+                  <button onClick={onInquiry} className="bg-[#E97D22] text-white px-10 py-4 rounded-full font-bold text-lg hover:bg-[#d6721e] transition-all shadow-lg shadow-orange-500/30 text-center whitespace-nowrap transform hover:scale-105">Get Started for Free</button>
+                  <p className="text-sm font-semibold text-slate-300 tracking-wide uppercase">Don't wait. Switch to CollegeGate.</p>
              </div>
          </div>
+      </div>
+
+      {/* Social Proof Section */}
+      <div className="mb-12 py-8 border-y border-slate-200 bg-white/50 rounded-3xl">
+        <p className="text-center text-sm font-bold text-slate-400 uppercase tracking-widest mb-6">Our Alumni Work At</p>
+        <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" alt="Google" className="h-8 md:h-10 object-contain" referrerPolicy="no-referrer" />
+          <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg" alt="Microsoft" className="h-8 md:h-10 object-contain" referrerPolicy="no-referrer" />
+          <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" alt="Amazon" className="h-8 md:h-10 object-contain" referrerPolicy="no-referrer" />
+          <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Cisco_logo_blue_2016.svg" alt="Cisco" className="h-8 md:h-10 object-contain" referrerPolicy="no-referrer" />
+          <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/IBM_logo.svg" alt="IBM" className="h-8 md:h-10 object-contain" referrerPolicy="no-referrer" />
+        </div>
       </div>
 
       <div className="sticky top-[64px] z-30 bg-[#f8fafc]/95 backdrop-blur-md pt-2 pb-4 -mx-4 px-4 md:mx-0 md:px-0 md:static md:bg-transparent mb-6">
@@ -136,10 +152,6 @@ const HomeView: React.FC<HomeViewProps> = ({
                                   <div className="flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded w-fit">
                                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                                       Ongoing Course
-                                  </div>
-                                  <div className="flex items-center gap-1 text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded w-fit">
-                                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                      Official Admission Partner
                                   </div>
                                   <div className="flex gap-2 mt-2">
                                       {course.modes.map(m => (

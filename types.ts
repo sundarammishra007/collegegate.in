@@ -89,6 +89,11 @@ export interface User {
   academicAchievements?: string;
   interests?: string[];
   preferredStudyModes?: CourseMode[];
+  dateOfBirth?: string;
+  hobby?: string;
+  dreamAndGoal?: string;
+  project?: string;
+  bestFriendName?: string;
 }
 
 export interface Inquiry {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { HashRouter, Routes, Route, useNavigate, Navigate, useParams } from 'react-router-dom';
+import { HashRouter, Routes, Route, useNavigate, Navigate, useParams, useLocation } from 'react-router-dom';
 import { NavView, College, User, Inquiry, Course, CourseMode, University } from './types';
 import { MOCK_COLLEGES, COURSES_DATA, UNIVERSITIES_DATA } from './constants';
 import { auth, db, saveUserToFirestore, getUserProfile, addInquiry, subscribeToInquiries } from './services/firebase';
@@ -15,9 +15,10 @@ import SignIn from './components/SignIn';
 import AdminDashboard from './components/AdminDashboard';
 import CounselorDashboard from './components/CounselorDashboard';
 import CollegePartnerDashboard from './components/CollegePartnerDashboard';
-import SkillsSection from './components/SkillsSection';
+import OpportunitiesSection from './components/OpportunitiesSection';
 import Logo from './components/Logo';
 import About from './components/About';
+import PrivacyPolicy from './components/PrivacyPolicy';
 import StudentProfile from './components/StudentProfile';
 import HomeView from './components/HomeView';
 import { NavDropdown } from './components/NavDropdown';
@@ -61,6 +62,7 @@ const CollegeDetailRoute = ({ colleges, onInquiry, onCompare, isComparing }: any
 
 function AppContent() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [user, setUser] = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
   
@@ -120,12 +122,29 @@ function AppContent() {
     }
   }, [user]);
 
+  // Redirect to profile if incomplete
+  useEffect(() => {
+    if (user && user.role === 'STUDENT') {
+      const isProfileIncomplete = !user.dateOfBirth || !user.hobby || !user.dreamAndGoal || !user.project || !user.bestFriendName;
+      if (isProfileIncomplete && location.pathname !== '/profile') {
+        navigate('/profile');
+      }
+    }
+  }, [user, location.pathname, navigate]);
+
   const handleLogin = (loggedInUser: User) => {
     setUser(loggedInUser);
     if (loggedInUser.role === 'ADMIN') navigate('/admin');
     else if (loggedInUser.role === 'COUNSELOR' || loggedInUser.role === 'ASSOCIATE_PARTNER') navigate('/counselor');
     else if (loggedInUser.role === 'COLLEGE_PARTNER') navigate('/partner');
-    else navigate('/');
+    else {
+      const isProfileIncomplete = !loggedInUser.dateOfBirth || !loggedInUser.hobby || !loggedInUser.dreamAndGoal || !loggedInUser.project || !loggedInUser.bestFriendName;
+      if (isProfileIncomplete) {
+        navigate('/profile');
+      } else {
+        navigate('/');
+      }
+    }
   };
 
   const handleLogout = async () => {
@@ -214,11 +233,11 @@ function AppContent() {
               <NavDropdown 
                 title="Opportunities" 
                 items={[
-                  { label: 'Apprenticeship' },
-                  { label: 'Internship' },
-                  { label: 'Job Fair' },
-                  { label: 'Hackathon' },
-                  { label: 'Freelancing' }
+                  { label: 'Apprenticeships', onClick: () => navigate('/opportunities') },
+                  { label: 'Internships', onClick: () => navigate('/opportunities') },
+                  { label: 'Hackathons & Tech Challenges', onClick: () => navigate('/opportunities') },
+                  { label: 'Job Fairs & Career Events', onClick: () => navigate('/opportunities') },
+                  { label: 'Seminars/Webinars', onClick: () => navigate('/opportunities') }
                 ]} 
               />
               <button onClick={() => navigate('/about')} className="px-4 py-2 rounded-full text-[15px] font-bold font-sans text-[#173054] hover:text-[#E97D22] transition-colors">About</button>
@@ -269,8 +288,9 @@ function AppContent() {
           <Route path="/admin" element={user ? <AdminDashboard colleges={colleges} setColleges={setColleges} courses={courses} setCourses={setCourses} universities={universities} setUniversities={setUniversities} inquiries={inquiries} /> : <Navigate to="/login" />} />
           <Route path="/counselor" element={user ? <CounselorDashboard counselor={user} inquiries={inquiries} /> : <Navigate to="/login" />} />
           <Route path="/partner" element={user ? <CollegePartnerDashboard partner={user} colleges={colleges} setColleges={setColleges} inquiries={inquiries} /> : <Navigate to="/login" />} />
-          <Route path="/skills" element={<SkillsSection />} />
+          <Route path="/opportunities" element={<OpportunitiesSection />} />
           <Route path="/about" element={<About />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/profile" element={user ? <StudentProfile user={user} onUpdateUser={setUser} onBack={() => navigate('/')} /> : <Navigate to="/login" />} />
           <Route path="/university/:id" element={<UniversityDetailRoute universities={universities} onInquiry={() => setShowInquiryModal(true)} />} />
           <Route path="/college/:id" element={<CollegeDetailRoute colleges={colleges} onInquiry={() => setShowInquiryModal(true)} onCompare={handleCompare} isComparing={false} />} />
@@ -284,9 +304,9 @@ function AppContent() {
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
             <span className="text-[10px] font-bold mt-1">Home</span>
           </button>
-          <button onClick={() => navigate('/skills')} className="flex flex-col items-center justify-center w-full h-full text-slate-400 hover:text-indigo-600">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
-            <span className="text-[10px] font-bold mt-1">Skills</span>
+          <button onClick={() => navigate('/opportunities')} className="flex flex-col items-center justify-center w-full h-full text-slate-400 hover:text-indigo-600">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+            <span className="text-[10px] font-bold mt-1">Opportunities</span>
           </button>
           <button onClick={() => navigate('/about')} className="flex flex-col items-center justify-center w-full h-full text-slate-400 hover:text-indigo-600">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -381,6 +401,15 @@ function AppContent() {
         </div>
       )}
 
+      {/* Movement Closing */}
+      <div className="bg-gradient-to-r from-indigo-600 to-violet-600 text-white py-16 text-center">
+        <div className="max-w-4xl mx-auto px-4">
+          <h2 className="text-3xl md:text-4xl font-black mb-4">Your career doesn’t start after graduation. It starts now.</h2>
+          <p className="text-xl font-medium mb-8">Join the CollegeGate Movement.</p>
+          <p className="text-indigo-200 font-bold tracking-widest uppercase">#CollegeGateMovement</p>
+        </div>
+      </div>
+
       {/* Footer */}
       <footer className="bg-[#173054] text-[#e2e8f0] py-16 mt-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -390,10 +419,16 @@ function AppContent() {
             <div className="flex flex-col items-center md:items-start gap-2 order-3 md:order-1">
               <p className="text-slate-300 font-medium text-sm">Made with love <span className="text-red-500">❤️</span>, proud being an Indian 🇮🇳</p>
               <p className="text-xs text-slate-400">© {new Date().getFullYear()} CollegeGate. All rights reserved.</p>
-              <a href="mailto:info@collegegate.in" className="text-sm hover:text-white transition-colors flex items-center gap-2 mt-1">
-                <svg className="w-4 h-4 text-[#E97D22]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                info@collegegate.in
-              </a>
+              <div className="flex flex-col gap-1 mt-1">
+                <a href="mailto:hello@collegegate.in" className="text-sm hover:text-white transition-colors flex items-center gap-2">
+                  <svg className="w-4 h-4 text-[#E97D22]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                  hello@collegegate.in
+                </a>
+                <button onClick={() => navigate('/privacy')} className="text-sm hover:text-white transition-colors flex items-center gap-2 text-left">
+                  <svg className="w-4 h-4 text-[#E97D22]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                  Privacy Policy
+                </button>
+              </div>
             </div>
 
             {/* Center: Logo & Tagline */}

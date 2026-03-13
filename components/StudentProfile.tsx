@@ -14,10 +14,22 @@ const StudentProfile: React.FC<StudentProfileProps> = ({ user, onUpdateUser, onB
     academicAchievements: user.academicAchievements || '',
     interests: user.interests ? user.interests.join(', ') : '',
     preferredStudyModes: user.preferredStudyModes || [] as CourseMode[],
+    dateOfBirth: user.dateOfBirth || '',
+    hobby: user.hobby || '',
+    dreamAndGoal: user.dreamAndGoal || '',
+    project: user.project || '',
+    bestFriendName: user.bestFriendName || '',
   });
 
   const [isEditing, setIsEditing] = useState(false);
   const [saving, setSaving] = useState(false);
+
+  // Check if profile is incomplete
+  useEffect(() => {
+    if (!user.dateOfBirth || !user.hobby || !user.dreamAndGoal || !user.project || !user.bestFriendName) {
+      setIsEditing(true);
+    }
+  }, [user]);
 
   const handleSave = async () => {
     setSaving(true);
@@ -26,13 +38,23 @@ const StudentProfile: React.FC<StudentProfileProps> = ({ user, onUpdateUser, onB
       academicAchievements: formData.academicAchievements,
       interests: formData.interests.split(',').map(i => i.trim()).filter(i => i),
       preferredStudyModes: formData.preferredStudyModes,
+      dateOfBirth: formData.dateOfBirth,
+      hobby: formData.hobby,
+      dreamAndGoal: formData.dreamAndGoal,
+      project: formData.project,
+      bestFriendName: formData.bestFriendName,
     };
 
     try {
         await updateDoc(doc(db, 'users', user.id), {
             academicAchievements: updatedUser.academicAchievements,
             interests: updatedUser.interests,
-            preferredStudyModes: updatedUser.preferredStudyModes
+            preferredStudyModes: updatedUser.preferredStudyModes,
+            dateOfBirth: updatedUser.dateOfBirth,
+            hobby: updatedUser.hobby,
+            dreamAndGoal: updatedUser.dreamAndGoal,
+            project: updatedUser.project,
+            bestFriendName: updatedUser.bestFriendName,
         });
         onUpdateUser(updatedUser);
         setIsEditing(false);
@@ -103,6 +125,77 @@ const StudentProfile: React.FC<StudentProfileProps> = ({ user, onUpdateUser, onB
           </div>
 
           <div className="space-y-8">
+            {/* Personal Info */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-3">Date of Birth</label>
+                {isEditing ? (
+                  <input
+                    type="date"
+                    className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 font-medium text-slate-700 outline-none focus:border-indigo-500 transition-all"
+                    value={formData.dateOfBirth}
+                    onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
+                  />
+                ) : (
+                  <p className="text-slate-700 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                    {user.dateOfBirth || <span className="text-slate-400 italic">Not provided.</span>}
+                  </p>
+                )}
+              </div>
+              <div>
+                <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-3">Best Friend Name</label>
+                {isEditing ? (
+                  <input
+                    type="text"
+                    className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 font-medium text-slate-700 outline-none focus:border-indigo-500 transition-all"
+                    value={formData.bestFriendName}
+                    onChange={(e) => setFormData({ ...formData, bestFriendName: e.target.value })}
+                    placeholder="E.g., Rahul"
+                  />
+                ) : (
+                  <p className="text-slate-700 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                    {user.bestFriendName || <span className="text-slate-400 italic">Not provided.</span>}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Aspirations & Projects */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-3">Dream and Goal</label>
+                {isEditing ? (
+                  <textarea
+                    className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 font-medium text-slate-700 outline-none focus:border-indigo-500 transition-all"
+                    rows={3}
+                    value={formData.dreamAndGoal}
+                    onChange={(e) => setFormData({ ...formData, dreamAndGoal: e.target.value })}
+                    placeholder="E.g., To become a Software Engineer at Google"
+                  />
+                ) : (
+                  <p className="text-slate-700 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                    {user.dreamAndGoal || <span className="text-slate-400 italic">Not provided.</span>}
+                  </p>
+                )}
+              </div>
+              <div>
+                <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-3">Project</label>
+                {isEditing ? (
+                  <textarea
+                    className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 font-medium text-slate-700 outline-none focus:border-indigo-500 transition-all"
+                    rows={3}
+                    value={formData.project}
+                    onChange={(e) => setFormData({ ...formData, project: e.target.value })}
+                    placeholder="E.g., Built a weather app using React"
+                  />
+                ) : (
+                  <p className="text-slate-700 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                    {user.project || <span className="text-slate-400 italic">Not provided.</span>}
+                  </p>
+                )}
+              </div>
+            </div>
+
             {/* Academic Achievements */}
             <div>
               <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-3">Academic Achievements</label>
@@ -121,30 +214,48 @@ const StudentProfile: React.FC<StudentProfileProps> = ({ user, onUpdateUser, onB
               )}
             </div>
 
-            {/* Interests */}
-            <div>
-              <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-3">Interests & Hobbies</label>
-              {isEditing ? (
-                <input
-                  type="text"
-                  className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 font-medium text-slate-700 outline-none focus:border-indigo-500 transition-all"
-                  value={formData.interests}
-                  onChange={(e) => setFormData({ ...formData, interests: e.target.value })}
-                  placeholder="E.g., Coding, Painting, Football (comma separated)"
-                />
-              ) : (
-                <div className="flex flex-wrap gap-2">
-                  {user.interests && user.interests.length > 0 ? (
-                    user.interests.map((interest, index) => (
-                      <span key={index} className="px-4 py-2 bg-violet-50 text-violet-700 rounded-xl font-bold text-sm border border-violet-100">
-                        {interest}
-                      </span>
-                    ))
-                  ) : (
-                    <span className="text-slate-400 italic bg-slate-50 p-4 rounded-2xl border border-slate-100 w-full block">No interests added yet.</span>
-                  )}
-                </div>
-              )}
+            {/* Interests & Hobby */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-3">Hobby</label>
+                {isEditing ? (
+                  <input
+                    type="text"
+                    className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 font-medium text-slate-700 outline-none focus:border-indigo-500 transition-all"
+                    value={formData.hobby}
+                    onChange={(e) => setFormData({ ...formData, hobby: e.target.value })}
+                    placeholder="E.g., Playing Guitar"
+                  />
+                ) : (
+                  <p className="text-slate-700 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                    {user.hobby || <span className="text-slate-400 italic">Not provided.</span>}
+                  </p>
+                )}
+              </div>
+              <div>
+                <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-3">Interests</label>
+                {isEditing ? (
+                  <input
+                    type="text"
+                    className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 font-medium text-slate-700 outline-none focus:border-indigo-500 transition-all"
+                    value={formData.interests}
+                    onChange={(e) => setFormData({ ...formData, interests: e.target.value })}
+                    placeholder="E.g., Coding, Painting, Football (comma separated)"
+                  />
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    {user.interests && user.interests.length > 0 ? (
+                      user.interests.map((interest, index) => (
+                        <span key={index} className="px-4 py-2 bg-violet-50 text-violet-700 rounded-xl font-bold text-sm border border-violet-100">
+                          {interest}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="text-slate-400 italic bg-slate-50 p-4 rounded-2xl border border-slate-100 w-full block">No interests added yet.</span>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Preferred Study Modes */}
