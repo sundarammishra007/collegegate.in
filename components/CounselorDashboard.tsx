@@ -8,21 +8,45 @@ interface CounselorDashboardProps {
 
 const CounselorDashboard: React.FC<CounselorDashboardProps> = ({ counselor, inquiries }) => {
   const assignedInquiries = inquiries.filter(inq => inq.assignedTo === counselor.id);
+  const isAmbassador = counselor.role === 'ASSOCIATE_PARTNER';
+  const connectionCount = assignedInquiries.length; // Using assigned inquiries as connections for now
 
   return (
     <div className="max-w-6xl mx-auto p-4 md:p-8">
       <div className="mb-8 bg-gradient-to-r from-purple-700 to-indigo-700 text-white p-8 rounded-3xl shadow-xl">
         <h2 className="text-3xl font-bold">Welcome, {counselor.name}</h2>
-        <p className="text-purple-100 mt-2">Specialization: {counselor.specialization || 'General Counselor'}</p>
+        <p className="text-purple-100 mt-2">{isAmbassador ? 'College Ambassador' : `Specialization: ${counselor.specialization || 'General Counselor'}`}</p>
         <div className="mt-6 flex gap-4">
             <div className="bg-white/10 backdrop-blur px-4 py-2 rounded-lg border border-white/20">
-                <span className="block text-2xl font-bold">{assignedInquiries.length}</span>
-                <span className="text-xs text-purple-200">Assigned Inquiries</span>
+                <span className="block text-2xl font-bold">{connectionCount}</span>
+                <span className="text-xs text-purple-200">{isAmbassador ? 'Connections' : 'Assigned Inquiries'}</span>
             </div>
             <div className="bg-white/10 backdrop-blur px-4 py-2 rounded-lg border border-white/20">
                 <span className="block text-2xl font-bold">Online</span>
                 <span className="text-xs text-emerald-300">Status</span>
             </div>
+            {isAmbassador && connectionCount >= 50 && (
+                <div className="bg-emerald-500/20 backdrop-blur px-4 py-2 rounded-lg border border-emerald-400/30 flex items-center gap-3">
+                    <div className="text-3xl">🏆</div>
+                    <div>
+                        <span className="block text-sm font-bold text-emerald-100">Milestone Unlocked!</span>
+                        <button className="text-xs font-bold text-white bg-emerald-600 px-3 py-1 rounded hover:bg-emerald-700 transition-colors mt-1 shadow-sm">
+                            Download Certificate of Excellence
+                        </button>
+                    </div>
+                </div>
+            )}
+            {isAmbassador && connectionCount < 50 && (
+                <div className="bg-white/10 backdrop-blur px-4 py-2 rounded-lg border border-white/20 flex-1 max-w-xs">
+                    <div className="flex justify-between text-xs text-purple-200 mb-1">
+                        <span>Certificate Progress</span>
+                        <span>{connectionCount} / 50</span>
+                    </div>
+                    <div className="w-full bg-white/20 rounded-full h-2">
+                        <div className="bg-emerald-400 h-2 rounded-full" style={{ width: `${(connectionCount / 50) * 100}%` }}></div>
+                    </div>
+                </div>
+            )}
         </div>
       </div>
 

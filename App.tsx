@@ -81,6 +81,7 @@ function AppContent() {
   const [compareList, setCompareList] = useState<string[]>([]);
   const [showInquiryModal, setShowInquiryModal] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [activeTab, setActiveTab] = useState<'all' | 'courses' | 'colleges'>('all');
 
   useEffect(() => {
@@ -147,10 +148,15 @@ function AppContent() {
     }
   };
 
-  const handleLogout = async () => {
+  const handleLogout = () => {
+      setShowLogoutModal(true);
+  };
+
+  const confirmLogout = async () => {
       try {
         await signOut(auth);
         setUser(null);
+        setShowLogoutModal(false);
         navigate('/');
       } catch (error) {
         console.error("Error signing out:", error);
@@ -282,6 +288,7 @@ function AppContent() {
               onUniversityClick={(id) => user ? navigate(`/university/${id}`) : setShowLoginModal(true)}
               onCollegeClick={(id) => user ? navigate(`/college/${id}`) : setShowLoginModal(true)}
               onAboutClick={() => navigate('/about')}
+              onGetStarted={() => navigate('/login')}
             />
           } />
           <Route path="/login" element={user ? <Navigate to="/" /> : <SignIn onLogin={handleLogin} onCancel={() => navigate('/')} />} />
@@ -481,6 +488,29 @@ function AppContent() {
       </footer>
 
       <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
+      
+      {showLogoutModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl">
+            <h3 className="text-xl font-bold text-slate-900 mb-2">Confirm Logout</h3>
+            <p className="text-slate-600 mb-6">Are you sure you want to logout from your account?</p>
+            <div className="flex justify-end gap-3">
+              <button 
+                onClick={() => setShowLogoutModal(false)}
+                className="px-4 py-2 rounded-xl text-slate-600 font-medium hover:bg-slate-100 transition-colors"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={confirmLogout}
+                className="px-4 py-2 rounded-xl bg-red-500 text-white font-medium hover:bg-red-600 transition-colors shadow-sm shadow-red-200"
+              >
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

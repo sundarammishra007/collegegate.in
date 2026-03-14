@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Course, CourseMode, University, College } from '../types';
-import { UNIVERSITIES_DATA } from '../constants';
+import { UNIVERSITIES_DATA, NEWS_DATA } from '../constants';
 
 interface HomeViewProps {
   searchTerm: string;
@@ -16,6 +16,7 @@ interface HomeViewProps {
   onUniversityClick: (id: string) => void;
   onCollegeClick: (id: string) => void;
   onAboutClick: () => void;
+  onGetStarted: () => void;
 }
 
 const HERO_IMAGES = [
@@ -37,7 +38,8 @@ const HomeView: React.FC<HomeViewProps> = ({
   onInquiry,
   onUniversityClick,
   onCollegeClick,
-  onAboutClick
+  onAboutClick,
+  onGetStarted
 }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
@@ -55,9 +57,12 @@ const HomeView: React.FC<HomeViewProps> = ({
   });
 
   const groupedCourses = {
-    Diploma: filteredCourses.filter(c => c.type === 'Diploma'),
-    UG: filteredCourses.filter(c => c.type === 'UG'),
-    PG: filteredCourses.filter(c => c.type === 'PG'),
+    Management: filteredCourses.filter(c => c.category === 'Management'),
+    Engineering: filteredCourses.filter(c => c.category === 'Engineering'),
+    Law: filteredCourses.filter(c => c.category === 'Law'),
+    Medical: filteredCourses.filter(c => c.category === 'Medical'),
+    'Media Courses': filteredCourses.filter(c => c.category === 'Media Courses'),
+    Other: filteredCourses.filter(c => c.category === 'Other' || !c.category),
   };
 
   return (
@@ -85,7 +90,7 @@ const HomeView: React.FC<HomeViewProps> = ({
                 <p className="text-slate-200 text-lg md:text-xl font-medium leading-relaxed">Access real-time cut-offs, premium internships, and world-class courses. Don't just get a degree—build a future.</p>
              </div>
              <div className="flex flex-col items-center gap-4 w-full md:w-auto">
-                  <button onClick={onInquiry} className="bg-[#E97D22] text-white px-10 py-4 rounded-full font-bold text-lg hover:bg-[#d6721e] transition-all shadow-lg shadow-orange-500/30 text-center whitespace-nowrap transform hover:scale-105">Get Started for Free</button>
+                  <button onClick={onGetStarted} className="bg-[#E97D22] text-white px-10 py-4 rounded-full font-bold text-lg hover:bg-[#d6721e] transition-all shadow-lg shadow-orange-500/30 text-center whitespace-nowrap transform hover:scale-105">Get Started for Free</button>
                   <p className="text-sm font-semibold text-slate-300 tracking-wide uppercase">Don't wait. Switch to CollegeGate.</p>
              </div>
          </div>
@@ -175,6 +180,31 @@ const HomeView: React.FC<HomeViewProps> = ({
         {(activeTab === 'all' || activeTab === 'courses') && filteredCourses.length === 0 && (
           <div className="text-center py-20">
             <p className="text-slate-400 text-lg">No courses found matching your criteria.</p>
+          </div>
+        )}
+
+        {/* News Section */}
+        {activeTab === 'all' && (
+          <div className="mt-16 pt-16 border-t border-slate-200">
+            <div className="flex justify-between items-end mb-8">
+                <h3 className="text-2xl font-black text-slate-800 flex items-center gap-2">
+                    <span className="w-2 h-8 bg-indigo-500 rounded-full"></span>
+                    Latest News & Updates
+                </h3>
+                <button className="text-sm font-bold text-indigo-600 hover:text-indigo-700">View All News &rarr;</button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {NEWS_DATA.map((news) => (
+                    <a key={news.id} href={news.link} className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition-all group flex flex-col h-full">
+                        <div className="flex justify-between items-start mb-3">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2 py-1 rounded">{news.category}</span>
+                            <span className="text-xs text-slate-400 font-medium">{news.date}</span>
+                        </div>
+                        <h4 className="font-bold text-slate-800 mb-2 group-hover:text-indigo-600 transition-colors line-clamp-2">{news.title}</h4>
+                        <p className="text-sm text-slate-500 line-clamp-3 mt-auto">{news.summary}</p>
+                    </a>
+                ))}
+            </div>
           </div>
         )}
 

@@ -14,7 +14,7 @@ interface AdminDashboardProps {
 }
 
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ colleges, setColleges, courses, setCourses, universities, setUniversities, inquiries }) => {
-  const [activeSection, setActiveSection] = useState<'DASHBOARD' | 'USERS' | 'COLLEGES' | 'COURSES' | 'INQUIRIES'>('DASHBOARD');
+  const [activeSection, setActiveSection] = useState<'DASHBOARD' | 'USERS' | 'COLLEGES' | 'COURSES' | 'INQUIRIES' | 'VERIFICATION' | 'CONTENT'>('DASHBOARD');
   const [users, setUsers] = useState<User[]>([]);
   const [editingUser, setEditingUser] = useState<string | null>(null);
   const [showAddUniversity, setShowAddUniversity] = useState(false);
@@ -345,6 +345,63 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ colleges, setColleges, 
       );
   };
 
+  const handleVerifyUser = async (userId: string, status: 'APPROVED' | 'REJECTED') => {
+      await updateUserProfile(userId, { verificationStatus: status });
+  };
+
+  const renderVerificationQueue = () => {
+      const pendingUsers = users.filter(u => u.verificationStatus === 'PENDING');
+
+      return (
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+              <div className="p-6 border-b border-slate-100">
+                  <h3 className="font-bold text-lg text-slate-800">Identity Verification Queue</h3>
+                  <p className="text-sm text-slate-500">Review and approve student identity documents.</p>
+              </div>
+              <div className="divide-y divide-slate-100">
+                  {pendingUsers.length > 0 ? (
+                      pendingUsers.map((user) => (
+                          <div key={user.id} className="p-6 hover:bg-slate-50 transition-colors flex items-center justify-between">
+                              <div className="flex items-center gap-4">
+                                  <div className="w-12 h-12 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-xl">
+                                      {user.name.charAt(0)}
+                                  </div>
+                                  <div>
+                                      <h4 className="font-bold text-slate-800">{user.name}</h4>
+                                      <p className="text-xs text-slate-500">{user.email} • {user.role}</p>
+                                      {user.idCardUrl ? (
+                                          <a href={user.idCardUrl} target="_blank" rel="noreferrer" className="text-xs font-bold text-indigo-600 hover:underline mt-1 inline-block">View ID Document</a>
+                                      ) : (
+                                          <span className="text-xs text-red-500 mt-1 inline-block">No Document Uploaded</span>
+                                      )}
+                                  </div>
+                              </div>
+                              <div className="flex gap-2">
+                                  <button 
+                                      onClick={() => handleVerifyUser(user.id, 'APPROVED')}
+                                      className="px-3 py-1.5 bg-emerald-100 text-emerald-700 font-bold text-xs rounded hover:bg-emerald-200 transition-colors"
+                                  >
+                                      Approve
+                                  </button>
+                                  <button 
+                                      onClick={() => handleVerifyUser(user.id, 'REJECTED')}
+                                      className="px-3 py-1.5 bg-red-100 text-red-700 font-bold text-xs rounded hover:bg-red-200 transition-colors"
+                                  >
+                                      Reject
+                                  </button>
+                              </div>
+                          </div>
+                      ))
+                  ) : (
+                      <div className="p-12 text-center text-slate-400">
+                          No pending verifications.
+                      </div>
+                  )}
+              </div>
+          </div>
+      );
+  };
+
   return (
     <div className="flex min-h-screen bg-slate-50">
         {/* Sidebar */}
@@ -369,6 +426,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ colleges, setColleges, 
                 <button onClick={() => setActiveSection('INQUIRIES')} className={`w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-colors ${activeSection === 'INQUIRIES' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}>
                     Inquiries
                 </button>
+                <button onClick={() => setActiveSection('VERIFICATION')} className={`w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-colors ${activeSection === 'VERIFICATION' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}>
+                    Verification Queue
+                </button>
+                <button onClick={() => setActiveSection('CONTENT')} className={`w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition-colors ${activeSection === 'CONTENT' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}>
+                    Content Management
+                </button>
             </nav>
             <div className="p-4 border-t border-slate-800">
                 <div className="text-xs text-slate-500 mb-2">Logged in as Admin</div>
@@ -384,6 +447,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ colleges, setColleges, 
                     {activeSection === 'COLLEGES' && 'Manage Universities'}
                     {activeSection === 'COURSES' && 'Manage Courses'}
                     {activeSection === 'INQUIRIES' && 'Student Inquiries'}
+                    {activeSection === 'VERIFICATION' && 'Identity Verification Queue'}
+                    {activeSection === 'CONTENT' && 'Content Management'}
                 </h1>
             </header>
 
@@ -392,6 +457,37 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ colleges, setColleges, 
             {activeSection === 'COLLEGES' && renderUniversities()}
             {activeSection === 'COURSES' && renderCourses()}
             {activeSection === 'INQUIRIES' && renderInquiries()}
+            {activeSection === 'VERIFICATION' && renderVerificationQueue()}
+            {activeSection === 'CONTENT' && (
+                <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                    <h3 className="font-bold text-lg text-slate-800 mb-4">Manage Platform Content</h3>
+                    <p className="text-sm text-slate-500 mb-6">Add, edit, or delete content across the platform.</p>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="border border-slate-200 p-6 rounded-xl hover:shadow-md transition-shadow">
+                            <h4 className="font-bold text-slate-800 mb-2">News & Updates</h4>
+                            <p className="text-xs text-slate-500 mb-4">Manage the news feed on the homepage.</p>
+                            <button className="w-full py-2 bg-indigo-50 text-indigo-600 font-bold rounded-lg hover:bg-indigo-100 transition-colors text-sm">
+                                Manage News
+                            </button>
+                        </div>
+                        <div className="border border-slate-200 p-6 rounded-xl hover:shadow-md transition-shadow">
+                            <h4 className="font-bold text-slate-800 mb-2">Cut-offs</h4>
+                            <p className="text-xs text-slate-500 mb-4">Update exam cut-off data.</p>
+                            <button className="w-full py-2 bg-indigo-50 text-indigo-600 font-bold rounded-lg hover:bg-indigo-100 transition-colors text-sm">
+                                Manage Cut-offs
+                            </button>
+                        </div>
+                        <div className="border border-slate-200 p-6 rounded-xl hover:shadow-md transition-shadow">
+                            <h4 className="font-bold text-slate-800 mb-2">Opportunities</h4>
+                            <p className="text-xs text-slate-500 mb-4">Manage internships and apprenticeships.</p>
+                            <button className="w-full py-2 bg-indigo-50 text-indigo-600 font-bold rounded-lg hover:bg-indigo-100 transition-colors text-sm">
+                                Manage Opportunities
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
 
         {/* Add University Modal */}

@@ -1,11 +1,47 @@
 import { College, Course, University } from './types';
 
+export const NEWS_DATA = [
+  {
+    id: 'n1',
+    title: 'JEE Main 2026 Registration Opens',
+    date: 'March 15, 2026',
+    category: 'Exam Update',
+    summary: 'The National Testing Agency (NTA) has officially opened the registration portal for JEE Main 2026 Session 1.',
+    link: '#'
+  },
+  {
+    id: 'n2',
+    title: 'Delhi University Announces New B.Tech Programs',
+    date: 'March 12, 2026',
+    category: 'University News',
+    summary: 'DU introduces three new B.Tech programs focusing on AI, Cyber Security, and Data Science starting this academic year.',
+    link: '#'
+  },
+  {
+    id: 'n3',
+    title: 'NEET UG 2026 Revised Syllabus Released',
+    date: 'March 10, 2026',
+    category: 'Exam Update',
+    summary: 'The Medical Counseling Committee has released the updated syllabus for NEET UG 2026. Check the changes here.',
+    link: '#'
+  },
+  {
+    id: 'n4',
+    title: 'Top 10 Emerging Careers in 2026',
+    date: 'March 08, 2026',
+    category: 'Career Insight',
+    summary: 'A recent study highlights the fastest-growing job sectors, with Green Energy and AI Ethics leading the chart.',
+    link: '#'
+  }
+];
+
 export const COURSES_DATA: Course[] = [
   // --- Diploma Programs ---
   {
     id: 'd1',
     name: 'Diploma in Computer Science Engineering',
     type: 'Diploma',
+    category: 'Engineering',
     modes: ['Regular', 'Distance'],
     image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&q=80&w=1000',
     description: 'Foundation in computing, programming, and system design.'
@@ -14,6 +50,7 @@ export const COURSES_DATA: Course[] = [
     id: 'd2',
     name: 'Diploma in Mechanical Engineering',
     type: 'Diploma',
+    category: 'Engineering',
     modes: ['Regular', 'Distance'],
     image: 'https://images.unsplash.com/photo-1537462715879-360eeb61a0ad?auto=format&fit=crop&q=80&w=1000',
     description: 'Study of mechanics, thermodynamics, and structural analysis.'
@@ -22,6 +59,7 @@ export const COURSES_DATA: Course[] = [
     id: 'd3',
     name: 'Diploma in Civil Engineering',
     type: 'Diploma',
+    category: 'Engineering',
     modes: ['Regular', 'Distance'],
     image: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&q=80&w=1000',
     description: 'Construction, design, and maintenance of physical environments.'
@@ -30,6 +68,7 @@ export const COURSES_DATA: Course[] = [
     id: 'd4',
     name: 'Diploma in Electronics & Communication',
     type: 'Diploma',
+    category: 'Engineering',
     modes: ['Regular', 'Distance'],
     image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=1000',
     description: 'Electronic circuits, communication systems, and signal processing.'
@@ -38,6 +77,7 @@ export const COURSES_DATA: Course[] = [
     id: 'd5',
     name: 'Diploma in Electrical Engineering',
     type: 'Diploma',
+    category: 'Engineering',
     modes: ['Regular', 'Distance'],
     image: 'https://images.unsplash.com/photo-1498084393753-b411b2d26b34?auto=format&fit=crop&q=80&w=1000',
     description: 'Study of electricity, electronics, and electromagnetism.'
@@ -46,6 +86,7 @@ export const COURSES_DATA: Course[] = [
     id: 'd6',
     name: 'Diploma in Pharmacy',
     type: 'Diploma',
+    category: 'Medical',
     modes: ['Regular'],
     image: 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?auto=format&fit=crop&q=80&w=1000',
     description: 'Fundamentals of pharmaceutical sciences and drug dispensing.'
@@ -54,6 +95,7 @@ export const COURSES_DATA: Course[] = [
     id: 'd7',
     name: 'Diploma in Marine Engineering',
     type: 'Diploma',
+    category: 'Engineering',
     modes: ['Regular'],
     image: 'https://images.unsplash.com/photo-1505672675380-412294c87e93?auto=format&fit=crop&q=80&w=1000',
     description: 'Operation and maintenance of ship machinery.'
@@ -70,6 +112,7 @@ export const COURSES_DATA: Course[] = [
     id: 'd9',
     name: '1 Year Diploma : Hotel, Hospital Operation',
     type: 'Diploma',
+    category: 'Management',
     modes: ['Regular'],
     image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&q=80&w=1000',
     description: 'Diploma in hotel and hospital operations management.'
@@ -80,6 +123,7 @@ export const COURSES_DATA: Course[] = [
     id: 'u1',
     name: 'BA - Bachelor of Arts',
     type: 'UG',
+    category: 'Other',
     modes: ['Regular', 'Online', 'Distance'],
     image: 'https://images.unsplash.com/photo-1457369804613-52c61a468e7d?auto=format&fit=crop&q=80&w=1000',
     description: 'Humanities, social sciences, and liberal arts.'
@@ -88,6 +132,7 @@ export const COURSES_DATA: Course[] = [
     id: 'u2',
     name: 'B.Com - Bachelor of Commerce',
     type: 'UG',
+    category: 'Management',
     modes: ['Regular', 'Online', 'Distance'],
     image: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&q=80&w=1000',
     description: 'Commerce, accounting, finance, and business law.'
@@ -96,6 +141,7 @@ export const COURSES_DATA: Course[] = [
     id: 'u3',
     name: 'BA LL.B',
     type: 'UG',
+    category: 'Law',
     modes: ['Regular'],
     image: 'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&q=80&w=1000',
     description: 'Integrated arts and law degree.'
@@ -104,6 +150,7 @@ export const COURSES_DATA: Course[] = [
     id: 'u4',
     name: 'B.Sc Nursing',
     type: 'UG',
+    category: 'Medical',
     modes: ['Regular'],
     image: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&q=80&w=1000',
     description: 'Professional nursing and healthcare.'
@@ -112,6 +159,7 @@ export const COURSES_DATA: Course[] = [
     id: 'u5',
     name: 'B.Sc Agriculture',
     type: 'UG',
+    category: 'Other',
     modes: ['Regular', 'Distance'],
     image: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?auto=format&fit=crop&q=80&w=1000',
     description: 'Agricultural science and modern farming techniques.'
@@ -120,6 +168,7 @@ export const COURSES_DATA: Course[] = [
     id: 'u6',
     name: 'B.Sc Biotechnology',
     type: 'UG',
+    category: 'Medical',
     modes: ['Regular'],
     image: 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&q=80&w=1000',
     description: 'Biological systems and technology application.'
@@ -128,6 +177,7 @@ export const COURSES_DATA: Course[] = [
     id: 'u7',
     name: 'B.Sc Forensic Science',
     type: 'UG',
+    category: 'Medical',
     modes: ['Regular'],
     image: 'https://images.unsplash.com/photo-1579154204601-01588f351e67?auto=format&fit=crop&q=80&w=1000',
     description: 'Application of science to criminal and civil laws.'
@@ -136,6 +186,7 @@ export const COURSES_DATA: Course[] = [
     id: 'u8',
     name: 'BCA - Bachelor of Computer Application',
     type: 'UG',
+    category: 'Engineering',
     modes: ['Regular', 'Online', 'Distance'],
     image: 'https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&q=80&w=1000',
     description: 'Software development and computer applications.'
@@ -144,6 +195,7 @@ export const COURSES_DATA: Course[] = [
     id: 'u9',
     name: 'BBA - Bachelor of Business Administration',
     type: 'UG',
+    category: 'Management',
     modes: ['Regular', 'Online', 'Distance'],
     image: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&q=80&w=1000',
     description: 'Business management and administration principles.'
@@ -160,6 +212,7 @@ export const COURSES_DATA: Course[] = [
     id: 'u11',
     name: 'B.Tech - Bachelor of Technology',
     type: 'UG',
+    category: 'Engineering',
     modes: ['Regular'],
     image: 'https://images.unsplash.com/photo-1581092921461-eab62e97a782?auto=format&fit=crop&q=80&w=1000',
     description: 'Engineering and technology disciplines.'
@@ -168,6 +221,7 @@ export const COURSES_DATA: Course[] = [
     id: 'u12',
     name: 'BPT - Bachelor of Physiotherapy',
     type: 'UG',
+    category: 'Medical',
     modes: ['Regular'],
     image: 'https://images.unsplash.com/photo-1576091160550-217358c7e618?auto=format&fit=crop&q=80&w=1000',
     description: 'Physical therapy and rehabilitation.'
@@ -176,6 +230,7 @@ export const COURSES_DATA: Course[] = [
     id: 'u13',
     name: 'B.Pharma - Bachelor of Pharmacy',
     type: 'UG',
+    category: 'Medical',
     modes: ['Regular'],
     image: 'https://images.unsplash.com/photo-1631549916768-4119b2e5f926?auto=format&fit=crop&q=80&w=1000',
     description: 'Pharmaceutical sciences and medicine.'
@@ -200,6 +255,7 @@ export const COURSES_DATA: Course[] = [
     id: 'u16',
     name: 'LLB',
     type: 'UG',
+    category: 'Law',
     modes: ['Regular'],
     image: 'https://images.unsplash.com/photo-1589391886645-d51941baf7fb?auto=format&fit=crop&q=80&w=1000',
     description: 'Law and legal studies.'
@@ -216,6 +272,7 @@ export const COURSES_DATA: Course[] = [
     id: 'u18',
     name: 'BHM / BHMCT',
     type: 'UG',
+    category: 'Management',
     modes: ['Regular'],
     image: 'https://images.unsplash.com/photo-1517840901100-8179e982acb7?auto=format&fit=crop&q=80&w=1000',
     description: 'Hotel management and catering technology.'
@@ -224,6 +281,7 @@ export const COURSES_DATA: Course[] = [
     id: 'u19',
     name: 'BSc Hotel Management',
     type: 'UG',
+    category: 'Management',
     modes: ['Regular'],
     image: 'https://images.unsplash.com/photo-1551882547-ff40c0d5bf8f?auto=format&fit=crop&q=80&w=1000',
     description: 'Bachelor of Science in Hotel Management.'
@@ -232,6 +290,7 @@ export const COURSES_DATA: Course[] = [
     id: 'u20',
     name: 'Bachelor Degree : Hotel & Hospitality Management',
     type: 'UG',
+    category: 'Management',
     modes: ['Regular'],
     image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&q=80&w=1000',
     description: 'Comprehensive degree in hotel and hospitality management.'
@@ -240,6 +299,7 @@ export const COURSES_DATA: Course[] = [
     id: 'u21',
     name: 'Bachelor in Travel & Tourism Management',
     type: 'UG',
+    category: 'Management',
     modes: ['Regular'],
     image: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&q=80&w=1000',
     description: 'Degree in travel and tourism operations.'
@@ -258,6 +318,7 @@ export const COURSES_DATA: Course[] = [
     id: 'p1',
     name: 'Master of Commerce',
     type: 'PG',
+    category: 'Management',
     modes: ['Regular', 'Online', 'Distance'],
     image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=1000',
     description: 'Advanced commerce and business studies.'
@@ -274,6 +335,7 @@ export const COURSES_DATA: Course[] = [
     id: 'p3',
     name: 'MCA - Master of Computer Applications',
     type: 'PG',
+    category: 'Engineering',
     modes: ['Regular', 'Online', 'Distance'],
     image: 'https://images.unsplash.com/photo-1555099962-4199c345e5dd?auto=format&fit=crop&q=80&w=1000',
     description: 'Advanced computer applications and software.'
@@ -306,6 +368,7 @@ export const COURSES_DATA: Course[] = [
     id: 'p7',
     name: 'LL.M - Master of Laws',
     type: 'PG',
+    category: 'Law',
     modes: ['Regular'],
     image: 'https://images.unsplash.com/photo-1505664194779-8beaceb93744?auto=format&fit=crop&q=80&w=1000',
     description: 'Advanced legal studies.'
@@ -313,7 +376,8 @@ export const COURSES_DATA: Course[] = [
   {
     id: 'p8',
     name: 'GNM - General Nursing and Midwifery',
-    type: 'Diploma', // GNM is typically a diploma, though listed under PG in the prompt list, I'll classify as Diploma/PG based on context, but usually it's a diploma. Let's stick to the prompt's grouping or just put it in Diploma? The prompt had it at the end. I'll put it in Diploma for accuracy or PG if strictly following the list order. Let's put it in Diploma as it's a Diploma course.
+    type: 'Diploma',
+    category: 'Medical', // GNM is typically a diploma, though listed under PG in the prompt list, I'll classify as Diploma/PG based on context, but usually it's a diploma. Let's stick to the prompt's grouping or just put it in Diploma? The prompt had it at the end. I'll put it in Diploma for accuracy or PG if strictly following the list order. Let's put it in Diploma as it's a Diploma course.
     modes: ['Regular'],
     image: 'https://images.unsplash.com/photo-1584515933487-9bdbb7d43153?auto=format&fit=crop&q=80&w=1000',
     description: 'Nursing and midwifery.'
@@ -322,6 +386,7 @@ export const COURSES_DATA: Course[] = [
     id: 'p9',
     name: 'MBA : Hotel Management , Hospitality Management',
     type: 'PG',
+    category: 'Management',
     modes: ['Regular'],
     image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&q=80&w=1000',
     description: 'Master of Business Administration in Hotel and Hospitality Management.'
@@ -330,6 +395,7 @@ export const COURSES_DATA: Course[] = [
     id: 'p10',
     name: 'Master Degree',
     type: 'PG',
+    category: 'Other',
     modes: ['Regular'],
     image: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&q=80&w=1000',
     description: 'General Master Degree programs.'
@@ -338,6 +404,7 @@ export const COURSES_DATA: Course[] = [
     id: 'p11',
     name: 'MBA : Hospital, Health Care Management',
     type: 'PG',
+    category: 'Management',
     modes: ['Regular'],
     image: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&q=80&w=1000',
     description: 'Master of Business Administration in Hospital and Healthcare Management.'

@@ -4,6 +4,7 @@ export interface Course {
   id: string;
   name: string;
   type: 'Diploma' | 'UG' | 'PG';
+  category?: 'Management' | 'Engineering' | 'Law' | 'Medical' | 'Media Courses' | 'Other';
   modes: CourseMode[];
   image: string;
   description?: string;
@@ -94,6 +95,38 @@ export interface User {
   dreamAndGoal?: string;
   project?: string;
   bestFriendName?: string;
+  idCardUrl?: string;
+  verificationStatus?: 'PENDING' | 'APPROVED' | 'REJECTED' | 'NOT_SUBMITTED';
+  idUploadedAt?: string;
+  rejectionReason?: string;
+}
+
+export interface Exam {
+  id: string;
+  name: string;
+  description: string;
+  officialWebsite: string;
+  examDate: string;
+  registrationDeadline: string;
+}
+
+export interface CutoffData {
+  id: string;
+  examId: string;
+  collegeId: string;
+  courseId: string;
+  year: number;
+  category: string; // e.g., General, OBC, SC, ST
+  openingRank: number;
+  closingRank: number;
+  round: number;
+}
+
+export interface ExamFact {
+  id: string;
+  examId: string;
+  factTitle: string;
+  factDescription: string;
 }
 
 export interface Inquiry {

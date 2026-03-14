@@ -23,6 +23,7 @@ const StudentProfile: React.FC<StudentProfileProps> = ({ user, onUpdateUser, onB
 
   const [isEditing, setIsEditing] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [uploadingId, setUploadingId] = useState(false);
 
   // Check if profile is incomplete
   useEffect(() => {
@@ -30,6 +31,41 @@ const StudentProfile: React.FC<StudentProfileProps> = ({ user, onUpdateUser, onB
       setIsEditing(true);
     }
   }, [user]);
+
+  const handleIdUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      setUploadingId(true);
+      // Simulate upload delay
+      setTimeout(async () => {
+          try {
+              // In a real app, upload to Firebase Storage here and get URL
+              const fakeUrl = `https://fake-storage.com/${file.name}`;
+              
+              const updatedUser: User = {
+                  ...user,
+                  idCardUrl: fakeUrl,
+                  verificationStatus: 'PENDING',
+                  idUploadedAt: new Date().toISOString()
+              };
+
+              await updateDoc(doc(db, 'users', user.id), {
+                  idCardUrl: fakeUrl,
+                  verificationStatus: 'PENDING',
+                  idUploadedAt: updatedUser.idUploadedAt
+              });
+              
+              onUpdateUser(updatedUser);
+              alert("ID Document uploaded successfully. It is now under review.");
+          } catch (error) {
+              console.error("Error uploading ID:", error);
+              alert("Failed to upload ID document.");
+          } finally {
+              setUploadingId(false);
+          }
+      }, 1500);
+  };
 
   const handleSave = async () => {
     setSaving(true);
@@ -277,6 +313,56 @@ const StudentProfile: React.FC<StudentProfileProps> = ({ user, onUpdateUser, onB
                   </button>
                 ))}
               </div>
+            </div>
+
+            {/* Identity Verification */}
+            <div className="pt-8 border-t border-slate-100">
+                <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-xl font-bold text-slate-800">Identity Verification</h3>
+                    <span className={`px-3 py-1 text-xs font-bold rounded-full uppercase tracking-wider ${
+                        user.verificationStatus === 'APPROVED' ? 'bg-emerald-100 text-emerald-700' :
+                        user.verificationStatus === 'PENDING' ? 'bg-amber-100 text-amber-700' :
+                        user.verificationStatus === 'REJECTED' ? 'bg-red-100 text-red-700' :
+                        'bg-slate-100 text-slate-600'
+                    }`}>
+                        {user.verificationStatus || 'NOT SUBMITTED'}
+                    </span>
+                </div>
+                
+                {user.verificationStatus === 'REJECTED' && user.rejectionReason && (
+                    <div className="mb-4 p-4 bg-red-50 text-red-700 rounded-xl text-sm border border-red-100">
+                        <span className="font-bold">Reason for rejection:</span> {user.rejectionReason}
+                    </div>
+                )}
+
+                <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100">
+                    <p className="text-sm text-slate-600 mb-4">
+                        Verify your identity to unlock premium features and apply for internships. Please upload a valid government-issued ID (Aadhar, PAN, Passport).
+                    </p>
+                    
+                    {user.verificationStatus === 'APPROVED' ? (
+                        <div className="flex items-center gap-2 text-emerald-600 font-bold">
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                            Your identity has been successfully verified.
+                        </div>
+                    ) : user.verificationStatus === 'PENDING' ? (
+                        <div className="flex items-center gap-2 text-amber-600 font-bold">
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            Your document is under review by our team.
+                        </div>
+                    ) : (
+                        <div className="flex items-center gap-4">
+                            <input 
+                                type="file" 
+                                accept="image/*,.pdf"
+                                onChange={handleIdUpload}
+                                disabled={uploadingId}
+                                className="text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer" 
+                            />
+                            {uploadingId && <span className="text-sm text-indigo-600 font-bold animate-pulse">Uploading...</span>}
+                        </div>
+                    )}
+                </div>
             </div>
           </div>
         </div>

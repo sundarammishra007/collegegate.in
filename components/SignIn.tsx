@@ -18,16 +18,18 @@ const SignIn: React.FC<SignInProps> = ({ onLogin, onCancel }) => {
     password: '',
     mobile: '',
     whatsapp: '',
-    specialization: '' // Only for partners if needed
+    specialization: '', // Only for partners if needed
+    bestFriendName: '',
+    consent: false
   });
   const [sameAsMobile, setSameAsMobile] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
     setFormData(prev => {
-        const newData = { ...prev, [name]: value };
+        const newData = { ...prev, [name]: type === 'checkbox' ? checked : value };
         if (name === 'mobile' && sameAsMobile) {
             newData.whatsapp = value;
         }
@@ -55,7 +57,8 @@ const SignIn: React.FC<SignInProps> = ({ onLogin, onCancel }) => {
           mobile: isSuperAdmin ? '8271042307' : formData.mobile,
           whatsapp: isSuperAdmin ? '8271042307' : (formData.whatsapp || formData.mobile),
           timestamp: new Date().toISOString(),
-          banned: false
+          banned: false,
+          bestFriendName: formData.bestFriendName || undefined
       };
 
       if (activeTab === 'COLLEGE_PARTNER' || activeTab === 'ASSOCIATE_PARTNER') {
@@ -114,6 +117,18 @@ const SignIn: React.FC<SignInProps> = ({ onLogin, onCancel }) => {
 
     if (!isLogin && (!formData.name || !formData.mobile)) {
         setError("Name and Mobile Number are required for registration.");
+        setLoading(false);
+        return;
+    }
+
+    if (!isLogin && activeTab === 'STUDENT' && !formData.bestFriendName) {
+        setError("Security Question (Best Friend's Name) is required for recovery.");
+        setLoading(false);
+        return;
+    }
+
+    if (!isLogin && !formData.consent) {
+        setError("You must agree to the Terms & Privacy Policy.");
         setLoading(false);
         return;
     }
@@ -300,6 +315,36 @@ const SignIn: React.FC<SignInProps> = ({ onLogin, onCancel }) => {
                             placeholder="••••••••"
                         />
                     </div>
+
+                    {!isLogin && activeTab === 'STUDENT' && (
+                        <div>
+                            <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Security Question: Best Friend's Name</label>
+                            <input 
+                                name="bestFriendName"
+                                type="text" 
+                                value={formData.bestFriendName}
+                                onChange={handleInputChange}
+                                className="w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none"
+                                placeholder="For account recovery"
+                            />
+                        </div>
+                    )}
+
+                    {!isLogin && (
+                        <div className="flex items-start gap-2 mt-2">
+                            <input 
+                                type="checkbox" 
+                                name="consent"
+                                id="consent"
+                                checked={formData.consent}
+                                onChange={handleInputChange}
+                                className="mt-1 rounded text-indigo-600 focus:ring-indigo-500 w-4 h-4 cursor-pointer"
+                            />
+                            <label htmlFor="consent" className="text-xs text-slate-600 cursor-pointer">
+                                I agree to the <a href="#" className="text-indigo-600 hover:underline">Terms of Service</a> and <a href="#" className="text-indigo-600 hover:underline">Privacy Policy</a>.
+                            </label>
+                        </div>
+                    )}
 
                     <button 
                         type="submit"
