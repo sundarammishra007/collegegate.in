@@ -102,6 +102,9 @@ function AppContent() {
              setUser(null); 
           }
         } catch (error) {
+          import('./services/firebase').then(({ handleFirestoreError, OperationType }) => {
+            handleFirestoreError(error, OperationType.GET, 'users');
+          });
           console.error("Error fetching user profile:", error);
         }
       } else {
@@ -113,9 +116,9 @@ function AppContent() {
     return () => unsubscribe();
   }, []);
 
-  // Subscribe to inquiries if user is Admin, Counselor, Associate Partner, or College Partner
+  // Subscribe to inquiries if user has CRM access
   useEffect(() => {
-    if (user && (user.role === 'ADMIN' || user.role === 'COUNSELOR' || user.role === 'ASSOCIATE_PARTNER' || user.role === 'COLLEGE_PARTNER' || user.crmAccess)) {
+    if (user && (user.role === 'ADMIN' || user.crmAccess)) {
       const unsubscribeInquiries = subscribeToInquiries((data) => {
         setInquiries(data);
       });
@@ -292,9 +295,9 @@ function AppContent() {
             />
           } />
           <Route path="/login" element={user ? <Navigate to="/" /> : <SignIn onLogin={handleLogin} onCancel={() => navigate('/')} />} />
-          <Route path="/admin" element={user ? <AdminDashboard colleges={colleges} setColleges={setColleges} courses={courses} setCourses={setCourses} universities={universities} setUniversities={setUniversities} inquiries={inquiries} /> : <Navigate to="/login" />} />
-          <Route path="/counselor" element={user ? <CounselorDashboard counselor={user} inquiries={inquiries} /> : <Navigate to="/login" />} />
-          <Route path="/partner" element={user ? <CollegePartnerDashboard partner={user} colleges={colleges} setColleges={setColleges} inquiries={inquiries} /> : <Navigate to="/login" />} />
+          <Route path="/admin" element={user && user.role === 'ADMIN' ? <AdminDashboard colleges={colleges} setColleges={setColleges} courses={courses} setCourses={setCourses} universities={universities} setUniversities={setUniversities} inquiries={inquiries} /> : <Navigate to={user ? "/" : "/login"} />} />
+          <Route path="/counselor" element={user && (user.role === 'COUNSELOR' || user.role === 'ASSOCIATE_PARTNER') ? <CounselorDashboard counselor={user} inquiries={inquiries} /> : <Navigate to={user ? "/" : "/login"} />} />
+          <Route path="/partner" element={user && user.role === 'COLLEGE_PARTNER' ? <CollegePartnerDashboard partner={user} colleges={colleges} setColleges={setColleges} inquiries={inquiries} /> : <Navigate to={user ? "/" : "/login"} />} />
           <Route path="/opportunities" element={<OpportunitiesSection />} />
           <Route path="/about" element={<About />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
