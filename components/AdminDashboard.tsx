@@ -89,6 +89,22 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ colleges, setColleges, 
               <div className="text-3xl font-black text-slate-800">{users.length}</div>
           </div>
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+              <div className="text-slate-500 text-sm font-bold uppercase mb-2">Students</div>
+              <div className="text-3xl font-black text-slate-800">{users.filter(u => u.role === 'STUDENT').length}</div>
+          </div>
+          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+              <div className="text-slate-500 text-sm font-bold uppercase mb-2">Partners</div>
+              <div className="text-3xl font-black text-slate-800">{users.filter(u => u.role === 'COLLEGE_PARTNER').length}</div>
+          </div>
+          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+              <div className="text-slate-500 text-sm font-bold uppercase mb-2">Companies</div>
+              <div className="text-3xl font-black text-slate-800">{users.filter(u => u.role === 'COMPANY').length}</div>
+          </div>
+          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+              <div className="text-slate-500 text-sm font-bold uppercase mb-2">Govt Officials</div>
+              <div className="text-3xl font-black text-slate-800">{users.filter(u => u.role === 'GOVT_OFFICIAL').length}</div>
+          </div>
+          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
               <div className="text-slate-500 text-sm font-bold uppercase mb-2">Universities</div>
               <div className="text-3xl font-black text-slate-800">{universities.length}</div>
           </div>
@@ -135,6 +151,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ colleges, setColleges, 
                                         <option value="COUNSELOR">COUNSELOR</option>
                                         <option value="COLLEGE_PARTNER">COLLEGE PARTNER</option>
                                         <option value="ASSOCIATE_PARTNER">ASSOCIATE</option>
+                                        <option value="COMPANY">COMPANY</option>
+                                        <option value="GOVT_OFFICIAL">GOVT OFFICIAL</option>
                                         <option value="ADMIN">ADMIN</option>
                                     </select>
                                 ) : (
@@ -145,6 +163,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ colleges, setColleges, 
                                         user.role === 'COUNSELOR' ? 'bg-purple-100 text-purple-700' :
                                         user.role === 'COLLEGE_PARTNER' ? 'bg-orange-100 text-orange-700' :
                                         user.role === 'ASSOCIATE_PARTNER' ? 'bg-teal-100 text-teal-700' :
+                                        user.role === 'COMPANY' ? 'bg-blue-100 text-blue-700' :
+                                        user.role === 'GOVT_OFFICIAL' ? 'bg-emerald-100 text-emerald-700' :
                                         'bg-indigo-100 text-indigo-700'
                                     }`}>
                                         {user.role}
