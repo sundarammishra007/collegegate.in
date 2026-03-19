@@ -209,27 +209,6 @@ const CollegeDetailView: React.FC<CollegeDetailViewProps> = ({ college, onBack, 
                  )) || <p className="text-slate-500 italic">Facility information not available.</p>}
               </div>
             </section>
-
-            {/* Notable Alumni */}
-            <section>
-               <div className="flex items-center gap-3 mb-6">
-                  <div className="h-8 w-1 bg-indigo-600 rounded-full"></div>
-                  <h2 className="text-2xl font-bold text-slate-800">Notable Alumni</h2>
-               </div>
-               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {college.alumni?.map((alum, index) => (
-                     <div key={index} className="flex items-center gap-4 p-4 rounded-xl border border-slate-100 bg-slate-50/50 hover:bg-slate-50 transition-colors">
-                        <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${getAvatarGradient(alum)} flex items-center justify-center text-white font-bold text-xl shadow-md transform hover:scale-110 transition-transform duration-300`}>
-                           {alum.charAt(0)}
-                        </div>
-                        <div>
-                           <p className="font-bold text-slate-800">{alum}</p>
-                           <p className="text-xs text-slate-500 font-medium">Distinguished Alumnus</p>
-                        </div>
-                     </div>
-                  )) || <p className="text-slate-500 italic">Alumni information not available.</p>}
-               </div>
-            </section>
           </div>
 
           {/* Sidebar (Desktop) */}
