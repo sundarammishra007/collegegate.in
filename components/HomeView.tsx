@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Course, CourseMode, University, College } from '../types';
-import { UNIVERSITIES_DATA, NEWS_DATA } from '../constants';
+import { Course, CourseMode, University, College, LiveUpdate } from '../types';
+import { UNIVERSITIES_DATA, MOCK_LIVE_UPDATES } from '../constants';
+import { subscribeToLiveUpdates } from '../services/supabase';
+import CollegeRankings from './CollegeRankings';
 
 interface HomeViewProps {
   searchTerm: string;
@@ -19,12 +21,6 @@ interface HomeViewProps {
   onGetStarted: () => void;
 }
 
-const HERO_IMAGES = [
-  "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&q=80&w=2000", // Graduates
-  "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&q=80&w=2000", // University Campus
-  "https://images.unsplash.com/photo-1511629091441-ee46146481b6?auto=format&fit=crop&q=80&w=2000", // Students studying
-];
-
 const HomeView: React.FC<HomeViewProps> = ({
   searchTerm,
   setSearchTerm,
@@ -41,146 +37,199 @@ const HomeView: React.FC<HomeViewProps> = ({
   onAboutClick,
   onGetStarted
 }) => {
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [liveUpdates, setLiveUpdates] = useState<LiveUpdate[]>([]);
+  const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % HERO_IMAGES.length);
-    }, 5000); // Change image every 5 seconds
-    return () => clearInterval(interval);
+    const unsubscribe = subscribeToLiveUpdates((updates) => {
+      if (updates.length > 0) {
+        setLiveUpdates(updates);
+      } else {
+        setLiveUpdates(MOCK_LIVE_UPDATES);
+      }
+    });
+
+    return () => unsubscribe();
   }, []);
 
-  const filteredCourses = courses.filter(c => {
-    const matchesSearch = c.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesMode = c.modes.includes(selectedMode);
-    return matchesSearch && matchesMode;
-  });
+  const heroSlides = liveUpdates.filter(update => update.is_highlight).slice(0, 3);
 
-  const groupedCourses = {
-    Management: filteredCourses.filter(c => c.category === 'Management'),
-    Engineering: filteredCourses.filter(c => c.category === 'Engineering'),
-    Law: filteredCourses.filter(c => c.category === 'Law'),
-    Medical: filteredCourses.filter(c => c.category === 'Medical'),
-    'Media Courses': filteredCourses.filter(c => c.category === 'Media Courses'),
-    Other: filteredCourses.filter(c => c.category === 'Other' || !c.category),
-  };
+  useEffect(() => {
+    if (heroSlides.length === 0) return;
+    const interval = setInterval(() => {
+      setCurrentSlideIndex((prevIndex) => (prevIndex + 1) % heroSlides.length);
+    }, 5000); // Change slide every 5 seconds
+    return () => clearInterval(interval);
+  }, [heroSlides.length]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 relative pb-24 md:pb-12">
-      <div className="mb-6 relative rounded-3xl overflow-hidden shadow-xl shadow-indigo-200/50 min-h-[400px] flex items-center">
-         <div className="absolute inset-0 bg-black">
-            <video 
-              autoPlay 
-              loop 
-              muted 
-              playsInline 
-              className="absolute inset-0 w-full h-full object-cover"
-              poster="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&q=80&w=2000"
-            >
-              <source src="https://cdn.pixabay.com/video/2020/05/25/40130-424883478_large.mp4" type="video/mp4" />
-              {/* Fallback image if video fails */}
-              <img src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&q=80&w=2000" alt="Campus" className="w-full h-full object-cover" />
-            </video>
-            {/* 40% dark overlay */}
-            <div className="absolute inset-0 bg-black/40"></div>
+      <div className="mb-6 relative rounded-3xl overflow-hidden shadow-xl shadow-indigo-200/50 min-h-[500px] flex flex-col md:flex-row items-stretch bg-slate-900">
+         {/* Left Side: Value Proposition */}
+         <div className="relative z-10 p-8 md:p-12 text-white flex flex-col justify-center w-full md:w-1/2 bg-gradient-to-br from-slate-900 to-indigo-900">
+             <div className="mb-8 max-w-xl">
+                <h2 className="text-4xl md:text-5xl font-black mb-6 leading-tight tracking-tight">Bridge the Gap from Campus to Career.</h2>
+                <p className="text-slate-300 text-lg font-medium leading-relaxed">Access real-time cut-offs, premium internships, and world-class courses. Don't just get a degree—build a future.</p>
+             </div>
+             <div className="flex flex-col items-start gap-4">
+                  <button onClick={onGetStarted} className="bg-[#E97D22] text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-[#d6721e] transition-all shadow-lg shadow-orange-500/30 text-center whitespace-nowrap transform hover:scale-105">Get Started for Free</button>
+                  <p className="text-sm font-semibold text-slate-400 tracking-wide uppercase">Don't wait. Switch to CollegeGate.</p>
+             </div>
          </div>
-         <div className="relative z-10 p-8 md:p-12 text-white flex flex-col items-center justify-center w-full text-center">
-             <div className="mb-8 max-w-3xl">
-                <h2 className="text-4xl md:text-6xl font-black mb-6 leading-tight tracking-tight">Bridge the Gap from Campus to Career.</h2>
-                <p className="text-slate-200 text-lg md:text-xl font-medium leading-relaxed">Access real-time cut-offs, premium internships, and world-class courses. Don't just get a degree—build a future.</p>
-             </div>
-             <div className="flex flex-col items-center gap-4 w-full md:w-auto">
-                  <button onClick={onGetStarted} className="bg-[#E97D22] text-white px-10 py-4 rounded-full font-bold text-lg hover:bg-[#d6721e] transition-all shadow-lg shadow-orange-500/30 text-center whitespace-nowrap transform hover:scale-105">Get Started for Free</button>
-                  <p className="text-sm font-semibold text-slate-300 tracking-wide uppercase">Don't wait. Switch to CollegeGate.</p>
-             </div>
+
+         {/* Right Side: Dynamic Live Slider */}
+         <div className="relative w-full md:w-1/2 min-h-[300px] md:min-h-full bg-slate-800 overflow-hidden">
+            {heroSlides.map((slide, index) => (
+                <div 
+                    key={slide.id} 
+                    className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${index === currentSlideIndex ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
+                >
+                    {slide.imageUrl && (
+                        <img src={slide.imageUrl} alt={slide.title} className="absolute inset-0 w-full h-full object-cover opacity-40" />
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent"></div>
+                    
+                    <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12">
+                        <span className="inline-block px-3 py-1 bg-indigo-600 text-white text-xs font-bold uppercase tracking-wider rounded-full mb-4 shadow-md">
+                            🔥 {slide.category}
+                        </span>
+                        <h3 className="text-2xl md:text-3xl font-black text-white mb-4 leading-tight">{slide.title}</h3>
+                        <ul className="space-y-2 mb-6">
+                            {slide.description.map((point, i) => (
+                                <li key={i} className="text-slate-300 text-sm flex items-start gap-2">
+                                    <span className="text-indigo-400 mt-0.5">•</span>
+                                    <span>{point}</span>
+                                </li>
+                            ))}
+                        </ul>
+                        <button 
+                            onClick={() => window.open(slide.original_source_url, '_blank')}
+                            className="text-white font-bold text-sm flex items-center gap-2 hover:text-indigo-300 transition-colors"
+                        >
+                            View Details <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                        </button>
+                    </div>
+                </div>
+            ))}
+            
+            {/* Slider Indicators */}
+            <div className="absolute bottom-6 right-8 z-20 flex gap-2">
+                {heroSlides.map((_, index) => (
+                    <button 
+                        key={index}
+                        onClick={() => setCurrentSlideIndex(index)}
+                        className={`w-2 h-2 rounded-full transition-all ${index === currentSlideIndex ? 'bg-white w-6' : 'bg-white/40 hover:bg-white/60'}`}
+                    />
+                ))}
+            </div>
          </div>
       </div>
 
-      {/* Social Proof Section */}
-      <div className="mb-12 py-8 border-y border-slate-200 bg-white/50 rounded-3xl">
-        <p className="text-center text-sm font-bold text-slate-400 uppercase tracking-widest mb-6">Our Alumni Work At</p>
-        <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" alt="Google" className="h-8 md:h-10 object-contain" referrerPolicy="no-referrer" />
-          <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg" alt="Microsoft" className="h-8 md:h-10 object-contain" referrerPolicy="no-referrer" />
-          <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" alt="Amazon" className="h-8 md:h-10 object-contain" referrerPolicy="no-referrer" />
-          <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Cisco_logo_blue_2016.svg" alt="Cisco" className="h-8 md:h-10 object-contain" referrerPolicy="no-referrer" />
-          <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/IBM_logo.svg" alt="IBM" className="h-8 md:h-10 object-contain" referrerPolicy="no-referrer" />
-        </div>
-      </div>
 
-      <div className="sticky top-[64px] z-30 bg-[#f8fafc]/95 backdrop-blur-md pt-2 pb-4 -mx-4 px-4 md:mx-0 md:px-0 md:static md:bg-transparent mb-6">
-          <div className="space-y-4">
-              <div className="relative w-full shadow-sm">
-                  <input type="text" placeholder="Search courses and colleges..." className="w-full pl-12 pr-10 py-4 rounded-2xl border border-slate-200 bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-medium text-slate-700 shadow-md" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
-                  <svg className="absolute left-4 top-4.5 h-6 w-6 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-              </div>
-              
-              <div className="flex w-full bg-white p-1 rounded-2xl shadow-sm border border-slate-200">
-                  {(['Regular', 'Online', 'Distance'] as const).map((mode) => (
-                      <button
-                          key={mode}
-                          onClick={() => setSelectedMode(mode)}
-                          className={`flex-1 py-3 rounded-xl text-sm font-bold transition-all ${
-                              selectedMode === mode 
-                              ? 'bg-indigo-600 text-white shadow-md' 
-                              : 'text-slate-500 hover:bg-slate-50'
-                          }`}
-                      >
-                          {mode}
-                      </button>
-                  ))}
-              </div>
-          </div>
-      </div>
 
       <div className="space-y-12">
-        {/* Course Sections */}
-        {(activeTab === 'all' || activeTab === 'courses') && Object.entries(groupedCourses).map(([type, typeCourses]) => (
-           typeCourses.length > 0 && (
-              <div key={type}>
-                  <h3 className="text-xl font-black text-slate-800 mb-6 flex items-center gap-2">
-                      <span className="w-1.5 h-6 bg-indigo-600 rounded-full"></span>
-                      {type === 'UG' ? 'Undergraduate (UG)' : type === 'PG' ? 'Postgraduate (PG)' : 'Diploma Programs'}
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {typeCourses.map((course) => (
-                          <div key={course.id} className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition-all group cursor-pointer" onClick={onInquiry}>
-                              <div className="flex items-start justify-between mb-4">
-                                  <div className="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
-                                      🎓
-                                  </div>
-                                  <span className="bg-slate-100 text-slate-600 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">{course.type}</span>
-                              </div>
-                              <h4 className="font-bold text-slate-800 text-lg mb-2 leading-tight group-hover:text-indigo-600 transition-colors">{course.name}</h4>
-                              <p className="text-sm text-slate-500 mb-4 line-clamp-2">{course.description}</p>
-                              <div className="flex flex-col gap-2 mt-auto">
-                                  <div className="flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded w-fit">
-                                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                                      Ongoing Course
-                                  </div>
-                                  <div className="flex gap-2 mt-2">
-                                      {course.modes.map(m => (
-                                          <span key={m} className={`text-[10px] px-2 py-0.5 rounded font-bold ${
-                                              m === 'Regular' ? 'bg-indigo-50 text-indigo-600' :
-                                              m === 'Online' ? 'bg-emerald-50 text-emerald-600' :
-                                              'bg-orange-50 text-orange-600'
-                                          }`}>
-                                              {m}
-                                          </span>
-                                      ))}
-                                  </div>
-                              </div>
-                          </div>
-                      ))}
-                  </div>
-              </div>
-           )
-        ))}
 
-        {(activeTab === 'all' || activeTab === 'courses') && filteredCourses.length === 0 && (
-          <div className="text-center py-20">
-            <p className="text-slate-400 text-lg">No courses found matching your criteria.</p>
-          </div>
+
+        {/* Live Sections: Exams, Opportunities, Events */}
+        {activeTab === 'all' && (
+            <div className="mt-16 pt-16 border-t border-slate-200 space-y-16">
+                
+                {/* University Hub: Exams & Cut-offs */}
+                <div>
+                    <div className="flex justify-between items-end mb-8">
+                        <h3 className="text-2xl font-black text-slate-800 flex items-center gap-2">
+                            <span className="w-2 h-8 bg-blue-500 rounded-full"></span>
+                            University Hub: Exams & Cut-offs
+                        </h3>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {liveUpdates.filter(u => u.category === 'Exam').map(update => (
+                            <div key={update.id} onClick={() => window.open(update.original_source_url, '_blank')} className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm hover:shadow-md transition-all cursor-pointer group">
+                                <div className="flex justify-between items-start mb-4">
+                                    <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-2 py-1 rounded">{update.category}</span>
+                                    <span className="text-xs text-slate-400 font-medium">{new Date(update.timestamp).toLocaleDateString()}</span>
+                                </div>
+                                <h4 className="font-bold text-slate-800 text-lg mb-3 group-hover:text-blue-600 transition-colors">{update.title}</h4>
+                                <ul className="space-y-2 mb-4">
+                                    {update.description.map((point, i) => (
+                                        <li key={i} className="text-slate-500 text-sm flex items-start gap-2">
+                                            <span className="text-blue-400 mt-0.5">•</span>
+                                            <span className="line-clamp-2">{point}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                                <span className="text-blue-600 text-sm font-bold flex items-center gap-1 mt-auto">
+                                    Official Portal <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                                </span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Opportunities: Apprenticeships & Internships */}
+                <div>
+                    <div className="flex justify-between items-end mb-8">
+                        <h3 className="text-2xl font-black text-slate-800 flex items-center gap-2">
+                            <span className="w-2 h-8 bg-emerald-500 rounded-full"></span>
+                            Live Opportunities
+                        </h3>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {liveUpdates.filter(u => u.category === 'Apprenticeship' || u.category === 'Internship').map(update => (
+                            <div key={update.id} onClick={() => window.open(update.original_source_url, '_blank')} className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm hover:shadow-md transition-all cursor-pointer group">
+                                <div className="flex justify-between items-start mb-4">
+                                    <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded ${update.category === 'Apprenticeship' ? 'text-emerald-600 bg-emerald-50' : 'text-teal-600 bg-teal-50'}`}>{update.category}</span>
+                                    <span className="text-xs text-slate-400 font-medium">{new Date(update.timestamp).toLocaleDateString()}</span>
+                                </div>
+                                <h4 className="font-bold text-slate-800 text-lg mb-3 group-hover:text-emerald-600 transition-colors">{update.title}</h4>
+                                <ul className="space-y-2 mb-4">
+                                    {update.description.map((point, i) => (
+                                        <li key={i} className="text-slate-500 text-sm flex items-start gap-2">
+                                            <span className="text-emerald-400 mt-0.5">•</span>
+                                            <span className="line-clamp-2">{point}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                                <span className="text-emerald-600 text-sm font-bold flex items-center gap-1 mt-auto">
+                                    Apply Now <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                                </span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Career Events */}
+                <div>
+                    <div className="flex justify-between items-end mb-8">
+                        <h3 className="text-2xl font-black text-slate-800 flex items-center gap-2">
+                            <span className="w-2 h-8 bg-purple-500 rounded-full"></span>
+                            Career Events & Webinars
+                        </h3>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {liveUpdates.filter(u => u.category === 'Event' || u.category === 'Job Fair').map(update => (
+                            <div key={update.id} onClick={() => window.open(update.original_source_url, '_blank')} className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm hover:shadow-md transition-all cursor-pointer group">
+                                <div className="flex justify-between items-start mb-4">
+                                    <span className="text-[10px] font-bold uppercase tracking-wider text-purple-600 bg-purple-50 px-2 py-1 rounded">{update.category}</span>
+                                    <span className="text-xs text-slate-400 font-medium">{new Date(update.timestamp).toLocaleDateString()}</span>
+                                </div>
+                                <h4 className="font-bold text-slate-800 text-lg mb-3 group-hover:text-purple-600 transition-colors">{update.title}</h4>
+                                <ul className="space-y-2 mb-4">
+                                    {update.description.map((point, i) => (
+                                        <li key={i} className="text-slate-500 text-sm flex items-start gap-2">
+                                            <span className="text-purple-400 mt-0.5">•</span>
+                                            <span className="line-clamp-2">{point}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                                <span className="text-purple-600 text-sm font-bold flex items-center gap-1 mt-auto">
+                                    Register <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                                </span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
         )}
 
         {/* News Section */}
@@ -194,14 +243,14 @@ const HomeView: React.FC<HomeViewProps> = ({
                 <button className="text-sm font-bold text-indigo-600 hover:text-indigo-700">View All News &rarr;</button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {NEWS_DATA.map((news) => (
-                    <a key={news.id} href={news.link} className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition-all group flex flex-col h-full">
+                {liveUpdates.slice(0, 4).map((update) => (
+                    <a key={update.id} href={update.original_source_url} target="_blank" rel="noopener noreferrer" className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition-all group flex flex-col h-full">
                         <div className="flex justify-between items-start mb-3">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2 py-1 rounded">{news.category}</span>
-                            <span className="text-xs text-slate-400 font-medium">{news.date}</span>
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2 py-1 rounded">{update.category}</span>
+                            <span className="text-xs text-slate-400 font-medium">{new Date(update.timestamp).toLocaleDateString()}</span>
                         </div>
-                        <h4 className="font-bold text-slate-800 mb-2 group-hover:text-indigo-600 transition-colors line-clamp-2">{news.title}</h4>
-                        <p className="text-sm text-slate-500 line-clamp-3 mt-auto">{news.summary}</p>
+                        <h4 className="font-bold text-slate-800 mb-2 group-hover:text-indigo-600 transition-colors line-clamp-2">{update.title}</h4>
+                        <p className="text-sm text-slate-500 line-clamp-3 mt-auto">{update.description[0]}</p>
                     </a>
                 ))}
             </div>
@@ -217,8 +266,6 @@ const HomeView: React.FC<HomeViewProps> = ({
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                   {universities.filter(u => 
-                    u.modes.includes(selectedMode) &&
-                    u.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
                     (selectedCountry === 'All' || u.country === selectedCountry)
                   ).map((uni) => (
                       <div 
@@ -261,7 +308,6 @@ const HomeView: React.FC<HomeViewProps> = ({
                   </h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                       {colleges.filter(c => 
-                        c.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
                         (selectedCountry === 'All' || c.country === selectedCountry)
                       ).map((college) => (
                           <div 
@@ -288,6 +334,7 @@ const HomeView: React.FC<HomeViewProps> = ({
                       ))}
                   </div>
               </div>
+              <CollegeRankings colleges={colleges} onCollegeClick={onCollegeClick} />
           </div>
         )}
       </div>
