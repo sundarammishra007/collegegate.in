@@ -171,6 +171,6 @@ export const updateInquiry = async (id: string, data: Partial<Inquiry>) => {
     handleFirestoreError(error, OperationType.UPDATE, 'inquiries');
     throw error;
   }
-});
+}; // This closes the function correctly without extra characters.
 
 
