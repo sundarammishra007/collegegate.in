@@ -171,6 +171,18 @@ export const updateInquiry = async (id: string, data: Partial<Inquiry>) => {
     handleFirestoreError(error, OperationType.UPDATE, 'inquiries');
     throw error;
   }
-}; // This closes the function correctly without extra characters.
+};
+
+export const subscribeToLiveUpdates = (callback: (updates: LiveUpdate[]) => void) => {
+  const liveUpdatesRef = collection(db, 'live_updates');
+  return onSnapshot(liveUpdatesRef, (snapshot) => {
+    const updates = snapshot.docs.map(doc => doc.data() as LiveUpdate);
+    // Sort by timestamp descending
+    updates.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+    callback(updates);
+  }, (error) => {
+    handleFirestoreError(error, OperationType.LIST, 'live_updates');
+  });
+};
 
 

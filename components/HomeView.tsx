@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Course, CourseMode, University, College, LiveUpdate } from '../types';
 import { UNIVERSITIES_DATA, MOCK_LIVE_UPDATES } from '../constants';
-// REMOVED: import { subscribeToLiveUpdates } from '../services/supabase'; 
+import { subscribeToLiveUpdates } from '../services/firebase';
 import CollegeRankings from './CollegeRankings';
 
 interface HomeViewProps {
@@ -42,9 +42,18 @@ const HomeView: React.FC<HomeViewProps> = ({
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
 
   useEffect(() => {
-    // Logic for Firebase Live Updates can be added here later.
-    // For now, we use the MOCK_LIVE_UPDATES to ensure the build passes.
-    setLiveUpdates(MOCK_LIVE_UPDATES);
+    // Subscribe to live updates from Firebase
+    const unsubscribe = subscribeToLiveUpdates((updates) => {
+      if (updates.length > 0) {
+        setLiveUpdates(updates);
+      } else {
+        // Fall back to mock data if no live updates
+        setLiveUpdates(MOCK_LIVE_UPDATES);
+      }
+    });
+
+    // Cleanup subscription on unmount
+    return () => unsubscribe();
   }, []);
 
   const heroSlides = liveUpdates.filter(update => update.is_highlight).slice(0, 3);

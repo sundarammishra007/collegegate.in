@@ -145,3 +145,13 @@ export interface Inquiry {
   collegeId?: string; // To link inquiry to specific college
   assignedTo?: string; // ID of the counselor/associate assigned
 }
+
+export interface LiveUpdate {
+  id: string;
+  title: string;
+  category: string;
+  timestamp: string;
+  description: string[];
+  is_highlight: boolean;
+  original_source_url: string;
+}

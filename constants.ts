@@ -1,4 +1,4 @@
-import { College, Course, University } from './types';
+import { College, Course, University, LiveUpdate } from './types';
 
 export const NEWS_DATA = [
   {
@@ -817,6 +817,61 @@ export const MOCK_COLLEGES: College[] = [
     image: 'https://images.unsplash.com/photo-1538108149393-fbbd81895907?auto=format&fit=crop&q=80&w=1000',
     description: 'The All India Institute of Medical Sciences (AIIMS) New Delhi is the premier medical research public university and hospital based in New Delhi, India.',
     tags: ['Medical', 'MBBS', 'Govt', 'Nursing']
+  }
+];
+
+export const MOCK_LIVE_UPDATES: LiveUpdate[] = [
+  {
+    id: '1',
+    title: 'JEE Main 2026 Registration Opens',
+    category: 'Exam',
+    timestamp: '2026-03-15T00:00:00Z',
+    description: [
+      'NTA opens registration for JEE Main 2026 Session 1',
+      'Last date to apply: March 25, 2026',
+      'Exam dates: April 15-20, 2026'
+    ],
+    is_highlight: true,
+    original_source_url: 'https://jeemain.nta.nic.in/'
+  },
+  {
+    id: '2',
+    title: 'NEET UG 2026 Syllabus Released',
+    category: 'Exam',
+    timestamp: '2026-03-10T00:00:00Z',
+    description: [
+      'Updated syllabus for NEET UG 2026 published',
+      'New topics added in Biology and Chemistry',
+      'Check official website for detailed changes'
+    ],
+    is_highlight: true,
+    original_source_url: 'https://neet.nta.nic.in/'
+  },
+  {
+    id: '3',
+    title: 'Software Engineer Internship at Google',
+    category: 'Internship',
+    timestamp: '2026-03-12T00:00:00Z',
+    description: [
+      '6-month internship program for final year students',
+      'Stipend: ₹80,000/month',
+      'Location: Bangalore, India'
+    ],
+    is_highlight: false,
+    original_source_url: 'https://careers.google.com/'
+  },
+  {
+    id: '4',
+    title: 'Apprenticeship Program at Tata Steel',
+    category: 'Apprenticeship',
+    timestamp: '2026-03-08T00:00:00Z',
+    description: [
+      '1-year apprenticeship in Mechanical Engineering',
+      'Training stipend provided',
+      'Full-time employment opportunity after completion'
+    ],
+    is_highlight: false,
+    original_source_url: 'https://tatasteel.com/careers'
   }
 ];
 
